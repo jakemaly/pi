@@ -1,0 +1,61 @@
+{
+  "providers": {
+    "llama": {
+      "baseUrl": "http://100.83.98.53",
+      "api": "openai-completions",
+      "models": [
+        {
+          "id": "Qwen3.6-27B-Q4_K_M.gguf",
+          "name": "Qwen3.6-27B-Q4_K_M.gguf",
+          "reasoning": false,
+          "input": [
+            "text"
+          ],
+          "contextWindow": 262144,
+          "maxTokens": 32768,
+          "limitSource": "detected",
+          "cost": {
+            "input": 0,
+            "output": 0,
+            "cacheRead": 0,
+            "cacheWrite": 0
+          }
+        }
+      ],
+      "compat": {
+        "supportsStore": false,
+        "supportsDeveloperRole": true,
+        "supportsReasoningEffort": false,
+        "supportsUsageInStreaming": true,
+        "maxTokensField": "max_tokens",
+        "supportsStrictMode": false,
+        "supportsLongCacheRetention": false
+      },
+      "apiKey": "no-key"
+    },
+    "deepseek": {
+      "baseUrl": "https://api.deepseek.com/v1",
+      "api": "openai-completions",
+      "apiKey": "sk-685bbf4672e542aa86633781c9287664",
+      "models": [
+        {
+          "id": "deepseek-v4-pro",
+          "name": "deepseek-v4-pro",
+          "reasoning": false,
+          "input": [
+            "text"
+          ],
+          "contextWindow": 262144,
+          "maxTokens": 8192,
+          "limitSource": "inferred",
+          "cost": {
+            "input": 0,
+            "output": 0,
+            "cacheRead": 0,
+            "cacheWrite": 0
+          }
+        }
+      ]
+    }
+  }
+}

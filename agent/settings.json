@@ -1,0 +1,12 @@
+{
+  "lastChangelogVersion": "0.78.1",
+  "packages": [
+    "npm:pi-setup-custom-providers"
+  ],
+  "enabledModels": [
+    "llama/Qwen3.6-27B-Q4_K_M.gguf",
+    "deepseek/deepseek-v4-pro"
+  ],
+  "defaultProvider": "llama",
+  "defaultModel": "Qwen3.6-27B-Q4_K_M.gguf"
+}

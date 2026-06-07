@@ -1,0 +1,13 @@
+# Transient state — never commit
+locks/
+sessions/
+
+# Backups
+*.bak
+*.save
+
+# Package manager
+npm/
+
+# Secrets
+auth.json
