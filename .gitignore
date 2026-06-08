@@ -1,6 +1,10 @@
 # Transient state — never commit
 locks/
 sessions/
+pipeline/
+
+# Runtime config — may contain keys
+web-search.json
 
 # Backups
 *.bak
