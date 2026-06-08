@@ -317,6 +317,17 @@ function countTaskFiles(artifactsDir: string): number {
   return fs.readdirSync(tasksDir).filter((f) => /^task-\d+\.md$/.test(f)).length;
 }
 
+/** Count tasks in plan.md via `### Task N:` headings */
+function parseTaskCount(planPath: string): number {
+  try {
+    const content = fs.readFileSync(planPath, "utf-8");
+    const matches = content.match(/^### Task \d+:/gm);
+    return matches ? matches.length : 0;
+  } catch {
+    return 0;
+  }
+}
+
 function writePipelineStatus(pipeline: Pipeline, mode: string, problem: string): void {
   const completed: string[] = [];
   const stageOrder = [
@@ -492,8 +503,10 @@ function buildStageInput(
       break;
 
     case "prompting":
-      parts.push(`## Plan\n\n${readArtifact("plan.md")}`);
-      parts.push(`## Tests\n\n${readArtifact("tests.md")}`);
+      parts.push(`## Plan (${pipeline.stages.coding.tasksTotal ?? "?"} tasks)\n\n${readArtifact("plan.md")}`);
+      parts.push(`\n## Tests\n\n${readArtifact("tests.md")}`);
+      parts.push(`\n\nYou must produce exactly ${pipeline.stages.coding.tasksTotal ?? "N"} task files.`);
+      parts.push(`Count the \`### Task N:\` headings in the plan to verify.`);
       break;
 
     case "coding": {
@@ -629,6 +642,22 @@ export default function (pi: ExtensionAPI) {
 
       if (pipeline.currentStage === "prompting") {
         pipeline.stages.coding.tasksTotal = countTaskFiles(pipeline.artifactsDir);
+
+        // Validate: prompter must produce exactly as many task files as the plan has tasks
+        const planTaskCount = parseTaskCount(path.join(pipeline.artifactsDir, "plan.md"));
+        if (planTaskCount > 0 && pipeline.stages.coding.tasksTotal !== planTaskCount) {
+          ctx.ui.notify(
+            `⚠ Prompter produced ${pipeline.stages.coding.tasksTotal} task files but plan has ${planTaskCount} tasks. Using plan count.`,
+            "warning",
+          );
+          pipeline.stages.coding.tasksTotal = planTaskCount;
+        }
+      }
+
+      // After planner: set task count from plan so prompter knows the target
+      if (pipeline.currentStage === "planning") {
+        const planPath = path.join(pipeline.artifactsDir, "plan.md");
+        pipeline.stages.coding.tasksTotal = parseTaskCount(planPath);
       }
 
       writePipeline(pipeline);
