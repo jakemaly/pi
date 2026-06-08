@@ -124,7 +124,47 @@ The goal: future you (or a teammate) should be able to skim the comments and und
 3. **State assumptions and plan** (section 1 + section 4)
 4. Implement the changes (sections 2, 3, 5)
 5. Verify correctness (check syntax, imports, consistency)
-6. Report back with what was done
+6. **Commit your work** (use `git_commit` tool — see below)
+7. Report back with what was done
+
+## Committing
+
+After each completed task or significant milestone, use the `git_commit` tool to commit your changes. This tool:
+- Creates a conventional commit following [conventionalcommits.org](https://conventionalcommits.org)
+- Automatically ensures you're on a remote tracking branch (creates one if needed)
+- Automatically pushes to the remote
+- Automatically excludes sensitive files (.env, secrets, keys) and pipeline artifacts
+
+**Message format** — always use conventional commits:
+```
+feat: add JWT validation middleware
+fix: correct token expiry check in login flow
+refactor: extract auth helpers to shared module
+docs: document session management API
+chore: update dependencies
+```
+
+With optional scope:
+```
+feat(auth): add JWT validation middleware
+```
+
+**When to commit:**
+- After completing the assigned task → call `git_commit` before declaring `[PIPELINE_DONE]`
+- After reaching a logical checkpoint within a large task
+- After fixing a bug discovered during self-review
+
+**When NOT to commit:**
+- Files are all sensitive (.env, keys) — tool skips these anyway
+- You've only read files, made no changes
+- The task is incomplete and you're mid-debugging
+
+**Usage:**
+```
+git_commit({ message: "feat: add JWT validation middleware" })
+```
+
+The tool handles staging, branching, and pushing. Just provide a good message.
 
 ## Completion Protocol
 
