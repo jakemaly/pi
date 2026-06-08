@@ -14,11 +14,15 @@
  * All other stages run in isolated child sessions.
  *
  * Advancement model:
- *   Child stages: agent_end → switch back to dashboard → /pipeline-advance in dashboard → createStageSession
- *   Dashboard stages: /pipeline-advance runs in dashboard → activate agent via slash command → inject context
+ *   agent_end (event handler): marks stage done, sends /pipeline-advance in current session
+ *   /pipeline-advance (command handler, has session-control methods): determines next stage,
+ *     creates child session OR switches to dashboard for interactive stages
  *
- * This ensures dashboard-bound stages (architect) are set up in the correct session
- * and agent-binder's internal state is properly updated via its slash command handlers.
+ * Critical API constraints:
+ *   - ctx.switchSession() and ctx.newSession() are ONLY on ExtensionCommandContext (commands),
+ *     NOT on ExtensionContext (event handlers). So agent_end cannot switch sessions.
+ *   - In switchSession's withSession callback, use replacementCtx.sendUserMessage(),
+ *     NOT pi.sendUserMessage() (pi is stale after replacement).
  */
 
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
@@ -51,7 +55,6 @@ const AGENTS: Record<string, { model: string; label: string; type: "decision" | 
   documentor:   { model: "llama/Qwen3.6-27B-Q4_K_M.gguf",    label: "Documentor (Qwen)",       type: "execution" },
 };
 
-/** Stage name → agent name mapping */
 const STAGE_TO_AGENT: Record<string, string> = {
   architecture:  "architect",
   planning:      "planner",
@@ -65,11 +68,10 @@ const STAGE_TO_AGENT: Record<string, string> = {
   documentation: "documentor",
 };
 
-/** Fixed handoff chain (used by legacy /implement command) */
 const HANDOFFS: Record<string, { to: string; produces: string }> = {
   orchestrator: { to: "researcher",  produces: "a research task" },
   researcher:   { to: "architect",   produces: "a research report" },
-  architect:    { to: "planner",     produces: "an architecture specification" },
+  architect:    { to: "planner",     produces: "an implementation plan" },
   planner:      { to: "tester",      produces: "an implementation plan" },
   tester:       { to: "prompter",    produces: "a master test specification" },
   prompter:     { to: "coder",       produces: "a coder prompt" },
@@ -79,7 +81,6 @@ const HANDOFFS: Record<string, { to: string; produces: string }> = {
   refactorer:   { to: "documentor",  produces: "refactored code" },
 };
 
-/** State machine: what comes after each stage */
 const NEXT_STAGE: Record<string, string> = {
   research:      "architecture",
   architecture:  "planning",
@@ -92,7 +93,6 @@ const NEXT_STAGE: Record<string, string> = {
   refactoring:   "documentation",
 };
 
-/** Stage → artifact path (relative to artifacts dir) */
 const STAGE_ARTIFACTS: Record<string, string> = {
   research:      "research.md",
   architecture:  "architecture.md",
@@ -106,7 +106,7 @@ const STAGE_ARTIFACTS: Record<string, string> = {
   documentation: "docs.md",
 };
 
-/** Stages where the agent runs in the DASHBOARD session (interactive) */
+/** Stages that run in the dashboard (interactive, user-in-the-loop) */
 const DASHBOARD_STAGES = new Set(["architecture"]);
 
 // ── Pipeline State ────────────────────────────────
@@ -149,7 +149,7 @@ function defaultStages(): Record<string, PipelineStage> {
   };
 }
 
-// ── Pipeline state helpers ────────────────────────
+// ── Helpers ───────────────────────────────────────
 
 function pipelinePath(pipelineId: string): string {
   return path.join(PIPELINE_BASE, pipelineId, "pipeline.json");
@@ -157,8 +157,7 @@ function pipelinePath(pipelineId: string): string {
 
 function readPipeline(pipelineId: string): Pipeline | null {
   try {
-    const raw = fs.readFileSync(pipelinePath(pipelineId), "utf-8");
-    return JSON.parse(raw);
+    return JSON.parse(fs.readFileSync(pipelinePath(pipelineId), "utf-8"));
   } catch {
     return null;
   }
@@ -179,8 +178,6 @@ function findPipelineId(entries: any[]): string | null {
   }
   return null;
 }
-
-// ── Session helpers ───────────────────────────────
 
 function readAgentPrompt(name: string): string | null {
   try {
@@ -203,9 +200,12 @@ function detectCurrentAgent(entries: any[]): string | null {
 function getLastAssistantMessage(sessionPath: string): string | null {
   try {
     const raw = fs.readFileSync(sessionPath, "utf-8").trim();
+    if (!raw) return null;
     const lines = raw.split("\n");
     for (let i = lines.length - 1; i >= 0; i--) {
-      const entry = JSON.parse(lines[i]);
+      if (!lines[i].trim()) continue;
+      let entry: any;
+      try { entry = JSON.parse(lines[i]); } catch { continue; }
       if (entry.type !== "message") continue;
       const msg = entry.message;
       if (!msg || msg.role !== "assistant") continue;
@@ -247,7 +247,7 @@ function collectWorkSummary(entries: any[]): string {
   return summary || "(no output produced)";
 }
 
-// ── Pipeline advance logic (PURE — no side effects) ─
+// ── Pipeline advance logic ────────────────────────
 
 interface AdvanceDecision {
   nextStage: string | null;
@@ -261,7 +261,6 @@ function decideNextStage(pipeline: Pipeline): AdvanceDecision {
 
   if (stage === "documentation") return { nextStage: null, isLoop: false };
 
-  // Debugger → check validation.json for failures
   if (stage === "debugging") {
     const validationPath = path.join(pipeline.artifactsDir, "validation.json");
     if (fs.existsSync(validationPath)) {
@@ -279,11 +278,10 @@ function decideNextStage(pipeline: Pipeline): AdvanceDecision {
           }
           return { nextStage: null, isLoop: false, reason: "Max remediation loops exceeded" };
         }
-      } catch { /* malformed JSON, fall through */ }
+      } catch { /* malformed JSON */ }
     }
   }
 
-  // Reviewer → check review.json for verdict
   if (stage === "review") {
     const reviewPath = path.join(pipeline.artifactsDir, "review.json");
     if (fs.existsSync(reviewPath)) {
@@ -304,25 +302,21 @@ function decideNextStage(pipeline: Pipeline): AdvanceDecision {
         if (r.verdict === "blocked") {
           return { nextStage: null, isLoop: false, reason: "Reviewer blocked — critical issue" };
         }
-        // approved — normal advance
       } catch { /* fall through */ }
     }
   }
 
-  // Normal advance
   const next = NEXT_STAGE[stage];
   if (!next) return { nextStage: null, isLoop: false };
   return { nextStage, isLoop: false };
 }
 
-/** Count task files created by the prompter */
 function countTaskFiles(artifactsDir: string): number {
   const tasksDir = path.join(artifactsDir, "tasks");
   if (!fs.existsSync(tasksDir)) return 0;
-  return fs.readdirSync(tasksDir).filter((f) => f.match(/^task-\d+\.md$/)).length;
+  return fs.readdirSync(tasksDir).filter((f) => /^task-\d+\.md$/.test(f)).length;
 }
 
-/** Write pipeline_status.json for planner anti-drift context */
 function writePipelineStatus(pipeline: Pipeline, mode: string, problem: string): void {
   const completed: string[] = [];
   const stageOrder = [
@@ -350,9 +344,9 @@ function writePipelineStatus(pipeline: Pipeline, mode: string, problem: string):
   fs.writeFileSync(statusPath, JSON.stringify(status, null, 2));
 }
 
-// ── Stage session factory ─────────────────────────
+// ── Stage session factory (CHILD stages only) ─────
 
-async function createStageSession(
+async function createChildStageSession(
   pi: ExtensionAPI,
   ctx: any,
   pipeline: Pipeline,
@@ -373,51 +367,20 @@ async function createStageSession(
     return;
   }
 
-  // Update pipeline state
   pipeline.currentStage = stageName;
   pipeline.stages[stageName].status = "in_progress";
   writePipeline(pipeline);
 
-  // Write pipeline_status.json for loop-back planner
   if (isLoop && (loopType === "remediation" || loopType === "review")) {
-    writePipelineStatus(pipeline, loopType, pipeline.loops[loopType] > 0
-      ? `${loopType} loop ${pipeline.loops[loopType]}/${pipeline.maxLoops[loopType]}`
-      : "initial");
-  }
-
-  // Determine input artifacts for this stage
-  const inputText = buildStageInput(pipeline, stageName, isLoop, loopType);
-
-  // ── DASHBOARD STAGES (architect) ──
-  // Activate the agent via its slash command so agent-binder's internal
-  // state is properly updated (locks, model, system prompt injection).
-  // Then inject context as a follow-up message.
-  if (DASHBOARD_STAGES.has(stageName)) {
-    const sessionFile = ctx.sessionManager.getSessionFile();
-    pipeline.stages[stageName].sessionFile = sessionFile;
-    writePipeline(pipeline);
-
-    // Persist pipeline state in dashboard so agent_end can find it
-    ctx.sessionManager.appendCustomEntry("pipeline-state", {
-      pipelineId: pipeline.id,
-    });
-
-    // Activate agent via slash command (updates agent-binder's state)
-    pi.sendUserMessage(`/${agentName}`, { deliverAs: "followUp" as any });
-
-    // Inject research + prompt context as follow-up
-    if (inputText) {
-      pi.sendUserMessage(inputText, { deliverAs: "followUp" as any });
-    }
-
-    ctx.ui.notify(
-      `${agentDef.label} — ask questions until zero remain. [PIPELINE_DONE] when ready.`,
-      "info",
+    writePipelineStatus(
+      pipeline, loopType,
+      pipeline.loops[loopType] > 0
+        ? `${loopType} loop ${pipeline.loops[loopType]}/${pipeline.maxLoops[loopType]}`
+        : "initial",
     );
-    return;
   }
 
-  // ── CHILD STAGES (all others) ──
+  const inputText = buildStageInput(pipeline, stageName, isLoop, loopType);
   const pipelineJson = JSON.stringify({
     pipelineId: pipeline.id,
     stageName,
@@ -427,21 +390,17 @@ async function createStageSession(
   });
 
   const result = await ctx.newSession({
-    setup: async (sm) => {
-      // Pipeline state for agent_end detection
+    setup: async (sm: any) => {
       sm.appendCustomEntry("pipeline-state", {
         pipelineId: pipeline.id,
         stageName,
         dashboardSessionFile: pipeline.dashboardSessionFile,
       });
-
-      // Agent activation via custom entry — session_start restores from this
       sm.appendCustomEntry("agent-binder", {
         active: agentName,
         prompt: agentPrompt,
       });
 
-      // Inject stage context
       const header = [
         `# Pipeline Stage: ${agentDef.label}`,
         `Pipeline: ${pipeline.title}`,
@@ -466,7 +425,7 @@ async function createStageSession(
         timestamp: Date.now(),
       });
     },
-    withSession: async (replacementCtx) => {
+    withSession: async (replacementCtx: any) => {
       replacementCtx.ui.notify(
         `${agentDef.label} working... (stage: ${stageName})`,
         "info",
@@ -553,8 +512,8 @@ function buildStageInput(
     }
 
     case "debugging":
-      parts.push(`## Tests\n\n${readArtifact("tests.md")}`);
-      parts.push(`## Test Scripts Location\n\n${path.join(artDir, "tests")}`);
+      parts.push(`## Test Scripts\n\nRun test scripts from: ${path.join(artDir, "tests")}`);
+      parts.push(`\nTest specification:\n\n${readArtifact("tests.md")}`);
       break;
 
     case "review":
@@ -567,14 +526,15 @@ function buildStageInput(
       break;
 
     case "documentation":
-      parts.push("## All Artifacts");
-      parts.push(`- Prompt: ${readArtifact("prompt.md")}`);
-      parts.push(`- Research: ${readArtifact("research.md")}`);
-      parts.push(`- Architecture: ${readArtifact("architecture.md")}`);
-      parts.push(`- Plan: ${readArtifact("plan.md")}`);
-      parts.push(`- Tests: ${readArtifact("tests.md")}`);
-      parts.push(`- Review: ${readArtifact("review.md")}`);
-      parts.push(`- Refactor: ${readArtifact("refactor.md")}`);
+      // List file paths instead of dumping all content (would overflow context)
+      const files = ["prompt.md", "research.md", "architecture.md", "plan.md", "tests.md", "review.md", "refactor.md"];
+      parts.push("## Artifacts to Document");
+      parts.push("The following files are available at the artifacts directory:");
+      parts.push(files.map((f) => {
+        const exists = fs.existsSync(path.join(artDir, f));
+        return `- \`${f}\`${exists ? "" : " (not found)"}`;
+      }).join("\n"));
+      parts.push(`\nUse the \`read\` tool to load each file: \`${artDir}/\``);
       break;
   }
 
@@ -586,16 +546,14 @@ function buildStageInput(
 export default function (pi: ExtensionAPI) {
   let handoffState: any = null;
 
-  // ── session_start: restore state + set model ──
+  // ── session_start ──
   pi.on("session_start", async (_event, ctx) => {
     const entries = ctx.sessionManager.getEntries();
-
-    // Check for pipeline state first
     const pipelineId = findPipelineId(entries);
+
     if (pipelineId) {
       const pipeline = readPipeline(pipelineId);
       if (pipeline) {
-        // Record this session's file in the pipeline stage
         const sessionFile = ctx.sessionManager.getSessionFile();
         const stage = pipeline.stages[pipeline.currentStage];
         if (stage && sessionFile) {
@@ -603,23 +561,20 @@ export default function (pi: ExtensionAPI) {
           writePipeline(pipeline);
         }
 
-        // Switch to the stage agent's model
         const agentName = STAGE_TO_AGENT[pipeline.currentStage];
         if (agentName) {
           const agentDef = AGENTS[agentName];
           if (agentDef) {
             const [provider, ...idParts] = agentDef.model.split("/");
             const model = ctx.modelRegistry.find(provider, idParts.join("/"));
-            if (model) {
-              await pi.setModel(model);
-            }
+            if (model) await pi.setModel(model);
           }
         }
         return;
       }
     }
 
-    // Legacy handoff state
+    // Legacy handoff
     for (let i = entries.length - 1; i >= 0; i--) {
       const e = entries[i];
       if (e.type === "custom" && e.customType === "orchestrator-handoff") {
@@ -627,21 +582,13 @@ export default function (pi: ExtensionAPI) {
         break;
       }
     }
-
     if (handoffState) {
       const agent = AGENTS[handoffState.childAgent];
       if (agent) {
         const [provider, ...idParts] = agent.model.split("/");
         const model = ctx.modelRegistry.find(provider, idParts.join("/"));
-        if (model) {
-          await pi.setModel(model);
-        }
+        if (model) await pi.setModel(model);
       }
-      const specName = path.basename(handoffState.specFile);
-      ctx.ui.notify(
-        `${agent?.label ?? handoffState.childAgent} session — ${specName}. /return when done.`,
-        "info",
-      );
       ctx.ui.setStatus("handoff", `🔄 ${handoffState.childAgent}`);
     } else {
       handoffState = null;
@@ -649,7 +596,9 @@ export default function (pi: ExtensionAPI) {
     }
   });
 
-  // ── agent_end: detect [PIPELINE_DONE] marker ──
+  // ── agent_end — detect [PIPELINE_DONE] marker ──
+  // This is an EVENT handler. It CANNOT call ctx.switchSession() or ctx.newSession()
+  // (those are ExtensionCommandContext methods only).
   pi.on("agent_end", async (event, ctx) => {
     const entries = ctx.sessionManager.getEntries();
     const pipelineId = findPipelineId(entries);
@@ -663,63 +612,45 @@ export default function (pi: ExtensionAPI) {
 
     stage.turns = (stage.turns ?? 0) + 1;
 
-    // Token-limit stop — let agent continue, don't count as nudge
+    // Token-limit stop — let agent continue
     if ((event as any).stopReason === "length") {
       writePipeline(pipeline);
       return;
     }
 
-    // Check for [PIPELINE_DONE] in the last assistant message
+    // Check for [PIPELINE_DONE]
     const sessionFile = ctx.sessionManager.getSessionFile();
     if (!sessionFile) return;
 
     const lastMsg = getLastAssistantMessage(sessionFile);
     if (lastMsg && lastMsg.includes(MARKER)) {
-      // Agent declared completion!
       stage.status = "done";
       stage.artifact = stage.artifact ?? STAGE_ARTIFACTS[pipeline.currentStage] ?? null;
 
-      // After prompter: count task files for the coder's task loop
       if (pipeline.currentStage === "prompting") {
-        const taskCount = countTaskFiles(pipeline.artifactsDir);
-        pipeline.stages.coding.tasksTotal = taskCount;
+        pipeline.stages.coding.tasksTotal = countTaskFiles(pipeline.artifactsDir);
       }
 
-      // Architect runs in dashboard — agent_end fires in dashboard,
-      // so /pipeline-advance runs in the right context already
-      if (DASHBOARD_STAGES.has(pipeline.currentStage)) {
-        writePipeline(pipeline);
-        ctx.ui.notify("Advancing pipeline...", "info");
-        pi.sendUserMessage(`/pipeline-advance ${pipeline.currentStage}`, {
-          deliverAs: "followUp" as any,
-        });
-        return;
-      }
-
-      // Child stage: switch back to dashboard, then advance from there.
-      // This ensures /pipeline-advance runs in the dashboard context,
-      // and dashboard-bound stages (architect) are set up properly.
       writePipeline(pipeline);
+      ctx.ui.notify("Advancing pipeline...", "info");
 
-      const dashboardFile = pipeline.dashboardSessionFile;
-      if (dashboardFile) {
-        await ctx.switchSession(dashboardFile, {
-          withSession: async (_replacementCtx: any) => {
-            pi.sendUserMessage(`/pipeline-advance ${pipeline.currentStage}`, {
-              deliverAs: "followUp" as any,
-            });
-          },
-        });
-      } else {
-        // Fallback: advance in current session (for backward compat)
-        pi.sendUserMessage(`/pipeline-advance ${pipeline.currentStage}`, {
-          deliverAs: "followUp" as any,
-        });
-      }
+      // Send /pipeline-advance in the current session.
+      // /pipeline-advance is a COMMAND handler, so it has access to
+      // switchSession/newSession for dashboard routing.
+      pi.sendUserMessage(`/pipeline-advance ${pipeline.currentStage}`, {
+        deliverAs: "followUp" as any,
+      });
       return;
     }
 
-    // Agent not done — nudge if taking too long
+    // ── Nudge / failure logic ──
+    // Dashboard stages (architect) are interactive — no max turn limit
+    if (DASHBOARD_STAGES.has(pipeline.currentStage)) {
+      writePipeline(pipeline);
+      return;
+    }
+
+    // Nudge if taking too long
     if (stage.turns >= MAX_TURNS_PER_STAGE && stage.nudges < MAX_NUDGES) {
       stage.nudges = (stage.nudges ?? 0) + 1;
       writePipeline(pipeline);
@@ -735,11 +666,8 @@ export default function (pi: ExtensionAPI) {
       stage.status = "failed";
       pipeline.status = "failed";
       writePipeline(pipeline);
-
-      const recap = buildFailureRecap(pipeline);
-      ctx.sessionManager.appendCustomEntry("pipeline-status", recap);
       ctx.ui.notify(
-        `Stage ${pipeline.currentStage} failed — ${stage.turns} turns without completion marker.`,
+        `Stage ${pipeline.currentStage} failed — ${stage.turns} turns without completion.`,
         "error",
       );
       return;
@@ -768,16 +696,13 @@ export default function (pi: ExtensionAPI) {
         return;
       }
 
-      // Ensure directories exist
       fs.mkdirSync(artDir, { recursive: true });
 
-      // Save brain dump as prompt.md
       fs.writeFileSync(
         path.join(artDir, "prompt.md"),
         `# Design Prompt\n\n${prompt}\n\n---\nStarted: ${now.toISOString()}\n`,
       );
 
-      // Create pipeline state
       const pipeline: Pipeline = {
         id,
         title: prompt.split("\n")[0].slice(0, 80),
@@ -794,7 +719,6 @@ export default function (pi: ExtensionAPI) {
       pipeline.stages.research.status = "in_progress";
       writePipeline(pipeline);
 
-      // Mark this session as the dashboard
       ctx.sessionManager.appendCustomEntry("pipeline-state", {
         pipelineId: id,
       });
@@ -809,12 +733,12 @@ export default function (pi: ExtensionAPI) {
         "info",
       );
 
-      // Kick off first stage: researcher (child session)
-      await createStageSession(pi, ctx, pipeline, "research", false);
+      await createChildStageSession(pi, ctx, pipeline, "research", false);
     },
   });
 
   // ── /pipeline-advance — advance to next stage ─────
+  // This is a COMMAND handler. It HAS access to ctx.switchSession/ctx.newSession.
   pi.registerCommand("pipeline-advance", {
     description: "Advance pipeline to next stage (internal)",
     handler: async (args, ctx) => {
@@ -837,7 +761,7 @@ export default function (pi: ExtensionAPI) {
         pipeline.stages[stageName].status = "done";
       }
 
-      // Coder task loop: increment task counter, loop if more tasks remain
+      // Coder task loop
       if (stageName === "coding") {
         const coding = pipeline.stages.coding;
         const tasksTotal = coding.tasksTotal ?? 0;
@@ -850,13 +774,11 @@ export default function (pi: ExtensionAPI) {
             `Task ${tasksDone}/${tasksTotal} done. Starting task ${tasksDone + 1}...`,
             "info",
           );
-          await createStageSession(pi, ctx, pipeline, "coding", false);
+          await createChildStageSession(pi, ctx, pipeline, "coding", false);
           return;
         }
-        // All tasks done — fall through to normal advance
       }
 
-      // Decide next stage
       const decision = decideNextStage(pipeline);
 
       if (!decision.nextStage) {
@@ -872,14 +794,13 @@ export default function (pi: ExtensionAPI) {
           ctx.ui.notify(`Pipeline blocked: ${decision.reason}`, "error");
           return;
         }
-        // Pipeline complete
         pipeline.status = "done";
         writePipeline(pipeline);
         ctx.ui.notify("Pipeline complete!", "info");
         return;
       }
 
-      // Apply loop counters (side effects happen HERE, not in decideNextStage)
+      // Apply loop counters
       if (decision.isLoop) {
         if (decision.loopType === "remediation") {
           pipeline.loops.remediation = (pipeline.loops.remediation ?? 0) + 1;
@@ -888,6 +809,52 @@ export default function (pi: ExtensionAPI) {
         }
       }
 
+      // ── Dashboard-bound stages (architect) ──
+      // Switch to dashboard session and activate the agent there.
+      // We use ctx (ExtensionCommandContext) which HAS switchSession.
+      // Inside withSession, we MUST use replacementCtx.sendUserMessage(),
+      // NOT pi.sendUserMessage() (pi would be stale after replacement).
+      if (DASHBOARD_STAGES.has(decision.nextStage)) {
+        pipeline.currentStage = decision.nextStage;
+        pipeline.stages[decision.nextStage].status = "in_progress";
+        writePipeline(pipeline);
+
+        const agentName = STAGE_TO_AGENT[decision.nextStage];
+        const agentDef = AGENTS[agentName];
+        const inputText = buildStageInput(
+          pipeline, decision.nextStage, decision.isLoop, decision.loopType,
+        );
+
+        const dashboardFile = pipeline.dashboardSessionFile;
+        await ctx.switchSession(dashboardFile, {
+          withSession: async (replacementCtx: any) => {
+            // Persist pipeline state in dashboard so agent_end can find it
+            replacementCtx.sessionManager.appendCustomEntry("pipeline-state", {
+              pipelineId: pipeline.id,
+            });
+
+            // Activate agent via slash command (updates agent-binder state)
+            await replacementCtx.sendUserMessage(`/${agentName}`, {
+              deliverAs: "followUp",
+            });
+
+            // Inject context as follow-up
+            if (inputText) {
+              await replacementCtx.sendUserMessage(inputText, {
+                deliverAs: "followUp",
+              });
+            }
+          },
+        });
+
+        ctx.ui.notify(
+          `${agentDef.label} — ask questions until zero remain. [PIPELINE_DONE] when ready.`,
+          "info",
+        );
+        return;
+      }
+
+      // ── All other stages: create child session ──
       writePipeline(pipeline);
       ctx.ui.notify(
         decision.isLoop
@@ -896,7 +863,7 @@ export default function (pi: ExtensionAPI) {
         "info",
       );
 
-      await createStageSession(
+      await createChildStageSession(
         pi, ctx, pipeline,
         decision.nextStage,
         decision.isLoop,
@@ -905,12 +872,11 @@ export default function (pi: ExtensionAPI) {
     },
   });
 
-  // ── /pipeline-status — show pipeline state ────────
+  // ── /pipeline-status ──
   pi.registerCommand("pipeline-status", {
     description: "Display current pipeline status",
     handler: async (_args, ctx) => {
-      const entries = ctx.sessionManager.getEntries();
-      const pipelineId = findPipelineId(entries);
+      const pipelineId = findPipelineId(ctx.sessionManager.getEntries());
       if (!pipelineId) {
         ctx.ui.notify("No active pipeline. Use /design to start one.", "info");
         return;
@@ -922,11 +888,8 @@ export default function (pi: ExtensionAPI) {
         return;
       }
 
-      const statusIcons: Record<string, string> = {
-        pending: " ",
-        in_progress: "●",
-        done: "✓",
-        failed: "✗",
+      const icons: Record<string, string> = {
+        pending: " ", in_progress: "●", done: "✓", failed: "✗",
       };
 
       const lines: string[] = [
@@ -945,7 +908,7 @@ export default function (pi: ExtensionAPI) {
 
       for (const s of stageOrder) {
         const stage = pipeline.stages[s];
-        const icon = statusIcons[stage.status] ?? "?";
+        const icon = icons[stage.status] ?? "?";
         const extra = s === "coding" && stage.tasksTotal
           ? ` [${stage.tasksDone ?? 0}/${stage.tasksTotal} tasks]`
           : "";
@@ -953,52 +916,14 @@ export default function (pi: ExtensionAPI) {
       }
 
       lines.push("│");
-      lines.push("│ Commands: /pipeline-status  /pipeline-pause  /pipeline-abort");
+      lines.push("│ /pipeline-status");
       lines.push("└──────────────────────────────────────────────────────────────");
 
       ctx.ui.notify(lines.join("\n"), "info");
     },
   });
 
-  // ── Failure recap builder ─────────────────────
-  function buildFailureRecap(pipeline: Pipeline): any {
-    const statusIcons: Record<string, string> = {
-      pending: " ",
-      in_progress: "●",
-      done: "✓",
-      failed: "✗",
-    };
-    const completed: string[] = [];
-    const failed: string[] = [];
-    const pending: string[] = [];
-
-    const stageOrder = [
-      "research", "architecture", "planning", "testing", "prompting",
-      "coding", "debugging", "review", "refactoring", "documentation",
-    ];
-
-    for (const s of stageOrder) {
-      const stage = pipeline.stages[s];
-      const icon = statusIcons[stage.status] ?? "?";
-      const line = `[${icon}] ${s}`;
-      if (stage.status === "done") completed.push(line);
-      else if (stage.status === "failed") failed.push(line);
-      else pending.push(line);
-    }
-
-    return {
-      title: pipeline.title,
-      status: "failed",
-      failedStage: pipeline.currentStage,
-      failedTurns: pipeline.stages[pipeline.currentStage]?.turns ?? 0,
-      completed,
-      failed,
-      pending,
-      artifactsDir: pipeline.artifactsDir,
-    };
-  }
-
-  // ── Legacy /implement — hand off a spec file ──
+  // ── Legacy /implement ──
   pi.registerCommand("implement", {
     description: "Hand off a spec file to the next agent in the workflow",
     handler: async (args, ctx) => {
@@ -1038,13 +963,13 @@ export default function (pi: ExtensionAPI) {
 
       const parentSessionFile = ctx.sessionManager.getSessionFile();
       if (!parentSessionFile) {
-        ctx.ui.notify("Session must be persisted for handoff (ephemeral not supported)", "error");
+        ctx.ui.notify("Session must be persisted (ephemeral not supported)", "error");
         return;
       }
 
       const result = await ctx.newSession({
         parentSession: parentSessionFile,
-        setup: async (sm) => {
+        setup: async (sm: any) => {
           sm.appendCustomEntry("orchestrator-handoff", {
             parentSessionFile,
             parentAgent: currentAgent,
@@ -1065,7 +990,7 @@ export default function (pi: ExtensionAPI) {
                 "You are the **coder** agent. Your job is to implement the specification below.",
                 "Read it carefully and implement exactly what it specifies.",
                 "",
-                "When you are done (success or failure), run `/return` to hand results back.",
+                "When you are done, run `/return` to hand results back.",
                 "",
                 "---",
                 "",
@@ -1075,7 +1000,7 @@ export default function (pi: ExtensionAPI) {
             timestamp: Date.now(),
           });
         },
-        withSession: async (replacementCtx) => {
+        withSession: async (replacementCtx: any) => {
           replacementCtx.ui.notify(
             `${childDef.label} | ${specName} — /return when done.`,
             "info",
@@ -1089,7 +1014,7 @@ export default function (pi: ExtensionAPI) {
     },
   });
 
-  // ── Legacy /return — return results to parent session ──
+  // ── Legacy /return ──
   pi.registerCommand("return", {
     description: "Return implementation results to the parent session",
     handler: async (args, ctx) => {
@@ -1133,7 +1058,7 @@ export default function (pi: ExtensionAPI) {
       }
 
       await ctx.switchSession(handoffState.parentSessionFile, {
-        withSession: async (replacementCtx) => {
+        withSession: async (replacementCtx: any) => {
           replacementCtx.ui.notify(
             `Returned to ${handoffState!.parentAgent} session. Results below.`,
             "info",
