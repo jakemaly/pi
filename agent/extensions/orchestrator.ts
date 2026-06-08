@@ -12,6 +12,13 @@
  *
  * Architect runs in dashboard session (user-in-the-loop).
  * All other stages run in isolated child sessions.
+ *
+ * Advancement model:
+ *   Child stages: agent_end → switch back to dashboard → /pipeline-advance in dashboard → createStageSession
+ *   Dashboard stages: /pipeline-advance runs in dashboard → activate agent via slash command → inject context
+ *
+ * This ensures dashboard-bound stages (architect) are set up in the correct session
+ * and agent-binder's internal state is properly updated via its slash command handlers.
  */
 
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
@@ -42,6 +49,20 @@ const AGENTS: Record<string, { model: string; label: string; type: "decision" | 
   debugger:     { model: "llama/Qwen3.6-27B-Q4_K_M.gguf",    label: "Debugger (Qwen)",         type: "execution" },
   refactorer:   { model: "llama/Qwen3.6-27B-Q4_K_M.gguf",    label: "Refactorer (Qwen)",       type: "execution" },
   documentor:   { model: "llama/Qwen3.6-27B-Q4_K_M.gguf",    label: "Documentor (Qwen)",       type: "execution" },
+};
+
+/** Stage name → agent name mapping */
+const STAGE_TO_AGENT: Record<string, string> = {
+  architecture:  "architect",
+  planning:      "planner",
+  research:      "researcher",
+  testing:       "tester",
+  prompting:     "prompter",
+  coding:        "coder",
+  debugging:     "debugger",
+  review:        "reviewer",
+  refactoring:   "refactorer",
+  documentation: "documentor",
 };
 
 /** Fixed handoff chain (used by legacy /implement command) */
@@ -77,8 +98,8 @@ const STAGE_ARTIFACTS: Record<string, string> = {
   architecture:  "architecture.md",
   planning:      "plan.md",
   testing:       "tests.md",
-  prompting:     "tasks/",           // prompter creates tasks/ dir
-  coding:        "",                 // coder works on tasks, doesn't produce single artifact
+  prompting:     "tasks/",
+  coding:        "",
   debugging:     "validation.md",
   review:        "review.md",
   refactoring:   "refactor.md",
@@ -105,6 +126,7 @@ interface Pipeline {
   title: string;
   status: "running" | "done" | "failed";
   currentStage: string;
+  dashboardSessionFile: string;
   startedAt: string;
   stages: Record<string, PipelineStage>;
   loops: { remediation: number; review: number };
@@ -133,10 +155,6 @@ function pipelinePath(pipelineId: string): string {
   return path.join(PIPELINE_BASE, pipelineId, "pipeline.json");
 }
 
-function artifactsDir(pipelineId: string): string {
-  return path.join(PIPELINE_BASE, pipelineId, "artifacts");
-}
-
 function readPipeline(pipelineId: string): Pipeline | null {
   try {
     const raw = fs.readFileSync(pipelinePath(pipelineId), "utf-8");
@@ -152,22 +170,11 @@ function writePipeline(pipeline: Pipeline): void {
   fs.writeFileSync(pipelinePath(pipeline.id), JSON.stringify(pipeline, null, 2));
 }
 
-/** Find the active pipeline ID from session entries */
 function findPipelineId(entries: any[]): string | null {
   for (let i = entries.length - 1; i >= 0; i--) {
     const e = entries[i];
     if (e.type === "custom" && e.customType === "pipeline-state") {
       return e.data?.pipelineId ?? null;
-    }
-  }
-  return null;
-}
-
-function findPipelineSessionId(entries: any[]): string | null {
-  for (let i = entries.length - 1; i >= 0; i--) {
-    const e = entries[i];
-    if (e.type === "custom" && e.customType === "pipeline-state") {
-      return e.data?.sessionId ?? null;
     }
   }
   return null;
@@ -193,7 +200,6 @@ function detectCurrentAgent(entries: any[]): string | null {
   return null;
 }
 
-/** Parse the last assistant text message from a session JSONL file */
 function getLastAssistantMessage(sessionPath: string): string | null {
   try {
     const raw = fs.readFileSync(sessionPath, "utf-8").trim();
@@ -241,20 +247,18 @@ function collectWorkSummary(entries: any[]): string {
   return summary || "(no output produced)";
 }
 
-// ── Pipeline advance logic ────────────────────────
+// ── Pipeline advance logic (PURE — no side effects) ─
 
 interface AdvanceDecision {
-  nextStage: string | null;  // null = pipeline complete
+  nextStage: string | null;
   isLoop: boolean;
   loopType?: "remediation" | "review";
   reason?: string;
-  skipAdvanceMessage?: boolean; // don't send "Starting X..." notification
 }
 
 function decideNextStage(pipeline: Pipeline): AdvanceDecision {
   const stage = pipeline.currentStage;
 
-  // Terminal
   if (stage === "documentation") return { nextStage: null, isLoop: false };
 
   // Debugger → check validation.json for failures
@@ -264,11 +268,8 @@ function decideNextStage(pipeline: Pipeline): AdvanceDecision {
       try {
         const v = JSON.parse(fs.readFileSync(validationPath, "utf-8"));
         if (v.failed > 0) {
-          // Remediation loop
-          const count = (pipeline.loops.remediation ?? 0) + 1;
+          const count = pipeline.loops.remediation + 1;
           if (count <= pipeline.maxLoops.remediation) {
-            pipeline.loops.remediation = count;
-            writePipeline(pipeline);
             return {
               nextStage: "planning",
               isLoop: true,
@@ -276,12 +277,9 @@ function decideNextStage(pipeline: Pipeline): AdvanceDecision {
               reason: `Debugger found ${v.failed} failures (remediation loop ${count}/${pipeline.maxLoops.remediation})`,
             };
           }
-          // Max loops exceeded — fail
-          pipeline.status = "failed";
-          writePipeline(pipeline);
           return { nextStage: null, isLoop: false, reason: "Max remediation loops exceeded" };
         }
-      } catch { /* malformed JSON, fall through to normal advance */ }
+      } catch { /* malformed JSON, fall through */ }
     }
   }
 
@@ -292,10 +290,8 @@ function decideNextStage(pipeline: Pipeline): AdvanceDecision {
       try {
         const r = JSON.parse(fs.readFileSync(reviewPath, "utf-8"));
         if (r.verdict === "issues") {
-          const count = (pipeline.loops.review ?? 0) + 1;
+          const count = pipeline.loops.review + 1;
           if (count <= pipeline.maxLoops.review) {
-            pipeline.loops.review = count;
-            writePipeline(pipeline);
             return {
               nextStage: "planning",
               isLoop: true,
@@ -303,13 +299,9 @@ function decideNextStage(pipeline: Pipeline): AdvanceDecision {
               reason: `Reviewer found issues (quality loop ${count}/${pipeline.maxLoops.review})`,
             };
           }
-          pipeline.status = "failed";
-          writePipeline(pipeline);
           return { nextStage: null, isLoop: false, reason: "Max review loops exceeded" };
         }
         if (r.verdict === "blocked") {
-          pipeline.status = "failed";
-          writePipeline(pipeline);
           return { nextStage: null, isLoop: false, reason: "Reviewer blocked — critical issue" };
         }
         // approved — normal advance
@@ -323,6 +315,41 @@ function decideNextStage(pipeline: Pipeline): AdvanceDecision {
   return { nextStage, isLoop: false };
 }
 
+/** Count task files created by the prompter */
+function countTaskFiles(artifactsDir: string): number {
+  const tasksDir = path.join(artifactsDir, "tasks");
+  if (!fs.existsSync(tasksDir)) return 0;
+  return fs.readdirSync(tasksDir).filter((f) => f.match(/^task-\d+\.md$/)).length;
+}
+
+/** Write pipeline_status.json for planner anti-drift context */
+function writePipelineStatus(pipeline: Pipeline, mode: string, problem: string): void {
+  const completed: string[] = [];
+  const stageOrder = [
+    "research", "architecture", "planning", "testing", "prompting",
+    "coding", "debugging", "review", "refactoring", "documentation",
+  ];
+  for (const s of stageOrder) {
+    if (pipeline.stages[s].status === "done") completed.push(s);
+  }
+
+  const status = {
+    role: "planner",
+    mode,
+    loop: mode === "remediation" ? pipeline.loops.remediation : pipeline.loops.review,
+    maxLoops: mode === "remediation" ? pipeline.maxLoops.remediation : pipeline.maxLoops.review,
+    completedStages: completed,
+    currentProblem: problem,
+    instructions: mode === "remediation"
+      ? "You are fixing test failures. Create targeted remediation tasks for ONLY the failing tests. Do NOT redesign architecture. Do NOT modify tests that pass. Do NOT expand scope."
+      : "You are fixing quality issues identified by the reviewer. Address ONLY the specific findings. Do NOT redesign architecture. Do NOT expand scope.",
+  };
+
+  const statusPath = path.join(pipeline.artifactsDir, "pipeline_status.json");
+  fs.mkdirSync(path.dirname(statusPath), { recursive: true });
+  fs.writeFileSync(statusPath, JSON.stringify(status, null, 2));
+}
+
 // ── Stage session factory ─────────────────────────
 
 async function createStageSession(
@@ -333,20 +360,7 @@ async function createStageSession(
   isLoop: boolean,
   loopType?: string,
 ) {
-  const stageMap: Record<string, string> = {
-    architecture:  "architect",
-    planning:      "planner",
-    research:      "researcher",
-    testing:       "tester",
-    prompting:     "prompter",
-    coding:        "coder",
-    debugging:     "debugger",
-    review:        "reviewer",
-    refactoring:   "refactorer",
-    documentation: "documentor",
-  };
-
-  const agentName = stageMap[stageName];
+  const agentName = STAGE_TO_AGENT[stageName];
   if (!agentName) {
     ctx.ui.notify(`Unknown stage: ${stageName}`, "error");
     return;
@@ -364,36 +378,37 @@ async function createStageSession(
   pipeline.stages[stageName].status = "in_progress";
   writePipeline(pipeline);
 
+  // Write pipeline_status.json for loop-back planner
+  if (isLoop && (loopType === "remediation" || loopType === "review")) {
+    writePipelineStatus(pipeline, loopType, pipeline.loops[loopType] > 0
+      ? `${loopType} loop ${pipeline.loops[loopType]}/${pipeline.maxLoops[loopType]}`
+      : "initial");
+  }
+
   // Determine input artifacts for this stage
   const inputText = buildStageInput(pipeline, stageName, isLoop, loopType);
 
-  // ARCHITECT runs in dashboard — activate agent, inject context, let user talk
+  // ── DASHBOARD STAGES (architect) ──
+  // Activate the agent via its slash command so agent-binder's internal
+  // state is properly updated (locks, model, system prompt injection).
+  // Then inject context as a follow-up message.
   if (DASHBOARD_STAGES.has(stageName)) {
-    // Activate architect in the current (dashboard) session
-    ctx.sessionManager.appendCustomEntry("agent-binder", {
-      active: agentName,
-      prompt: agentPrompt,
-    });
+    const sessionFile = ctx.sessionManager.getSessionFile();
+    pipeline.stages[stageName].sessionFile = sessionFile;
+    writePipeline(pipeline);
 
+    // Persist pipeline state in dashboard so agent_end can find it
     ctx.sessionManager.appendCustomEntry("pipeline-state", {
       pipelineId: pipeline.id,
-      sessionId: ctx.sessionManager.getSessionFile(),
     });
 
+    // Activate agent via slash command (updates agent-binder's state)
+    pi.sendUserMessage(`/${agentName}`, { deliverAs: "followUp" as any });
+
+    // Inject research + prompt context as follow-up
     if (inputText) {
-      ctx.sessionManager.appendMessage({
-        role: "user",
-        content: [{ type: "text", text: inputText }],
-        timestamp: Date.now(),
-      });
+      pi.sendUserMessage(inputText, { deliverAs: "followUp" as any });
     }
-
-    await pi.setModel(ctx.modelRegistry.find(
-      ...agentDef.model.split("/"),
-    ));
-
-    pipeline.stages[stageName].sessionFile = ctx.sessionManager.getSessionFile();
-    writePipeline(pipeline);
 
     ctx.ui.notify(
       `${agentDef.label} — ask questions until zero remain. [PIPELINE_DONE] when ready.`,
@@ -402,7 +417,7 @@ async function createStageSession(
     return;
   }
 
-  // All other stages: create isolated child session
+  // ── CHILD STAGES (all others) ──
   const pipelineJson = JSON.stringify({
     pipelineId: pipeline.id,
     stageName,
@@ -413,16 +428,20 @@ async function createStageSession(
 
   const result = await ctx.newSession({
     setup: async (sm) => {
+      // Pipeline state for agent_end detection
       sm.appendCustomEntry("pipeline-state", {
         pipelineId: pipeline.id,
         stageName,
+        dashboardSessionFile: pipeline.dashboardSessionFile,
       });
+
+      // Agent activation via custom entry — session_start restores from this
       sm.appendCustomEntry("agent-binder", {
         active: agentName,
         prompt: agentPrompt,
       });
 
-      // Inject stage context: pipeline config + input artifacts
+      // Inject stage context
       const header = [
         `# Pipeline Stage: ${agentDef.label}`,
         `Pipeline: ${pipeline.title}`,
@@ -460,9 +479,7 @@ async function createStageSession(
     return;
   }
 
-  // Record session for tracking
-  // (SessionFile is set from inside the child session via session_start)
-  pipeline.stages[stageName].sessionFile = "";  // filled by session_start handler
+  pipeline.stages[stageName].sessionFile = "";
   writePipeline(pipeline);
 }
 
@@ -494,15 +511,15 @@ function buildStageInput(
 
     case "planning":
       if (isLoop && loopType === "remediation") {
-        // Remediation: validation.json + pipeline_status.json + plan.md
         parts.push("## Remediation Mode");
         parts.push("You are fixing test failures. Do NOT redesign the architecture.");
+        parts.push(`## Pipeline Status\n\n${readArtifact("pipeline_status.json")}`);
         parts.push(`## Failures\n\n${readArtifact("validation.json")}`);
         parts.push(`## Original Plan\n\n${readArtifact("plan.md")}`);
       } else if (isLoop && loopType === "review") {
-        // Quality loop: review.json + plan.md
         parts.push("## Quality Fix Mode");
         parts.push("Address the reviewer's findings. Do NOT redesign the architecture.");
+        parts.push(`## Pipeline Status\n\n${readArtifact("pipeline_status.json")}`);
         parts.push(`## Review Findings\n\n${readArtifact("review.json")}`);
         parts.push(`## Original Plan\n\n${readArtifact("plan.md")}`);
       } else {
@@ -521,7 +538,6 @@ function buildStageInput(
       break;
 
     case "coding": {
-      // Determine which task to execute
       const tasksTotal = pipeline.stages.coding.tasksTotal ?? 0;
       const tasksDone = pipeline.stages.coding.tasksDone ?? 0;
       const taskNum = tasksDone + 1;
@@ -546,13 +562,11 @@ function buildStageInput(
       parts.push(`## Tests\n\n${readArtifact("tests.md")}`);
       break;
 
-    case "refactoring": {
+    case "refactoring":
       parts.push(`## Review\n\n${readArtifact("review.md")}`);
       break;
-    }
 
     case "documentation":
-      // Terminal stage — gets everything
       parts.push("## All Artifacts");
       parts.push(`- Prompt: ${readArtifact("prompt.md")}`);
       parts.push(`- Research: ${readArtifact("research.md")}`);
@@ -570,9 +584,9 @@ function buildStageInput(
 // ── Extension ──────────────────────────────────────
 
 export default function (pi: ExtensionAPI) {
-  let handoffState: any = null; // for legacy /implement /return
+  let handoffState: any = null;
 
-  // ── session_start: restore pipeline state ──
+  // ── session_start: restore state + set model ──
   pi.on("session_start", async (_event, ctx) => {
     const entries = ctx.sessionManager.getEntries();
 
@@ -590,19 +604,7 @@ export default function (pi: ExtensionAPI) {
         }
 
         // Switch to the stage agent's model
-        const stageMap: Record<string, string> = {
-          architecture:  "architect",
-          planning:      "planner",
-          research:      "researcher",
-          testing:       "tester",
-          prompting:     "prompter",
-          coding:        "coder",
-          debugging:     "debugger",
-          review:        "reviewer",
-          refactoring:   "refactorer",
-          documentation: "documentor",
-        };
-        const agentName = stageMap[pipeline.currentStage];
+        const agentName = STAGE_TO_AGENT[pipeline.currentStage];
         if (agentName) {
           const agentDef = AGENTS[agentName];
           if (agentDef) {
@@ -661,10 +663,10 @@ export default function (pi: ExtensionAPI) {
 
     stage.turns = (stage.turns ?? 0) + 1;
 
-    // Check for token-limit stop — don't count as nudge, let agent continue
+    // Token-limit stop — let agent continue, don't count as nudge
     if ((event as any).stopReason === "length") {
       writePipeline(pipeline);
-      return; // Agent hit max_tokens, gets another turn automatically
+      return;
     }
 
     // Check for [PIPELINE_DONE] in the last assistant message
@@ -677,24 +679,47 @@ export default function (pi: ExtensionAPI) {
       stage.status = "done";
       stage.artifact = stage.artifact ?? STAGE_ARTIFACTS[pipeline.currentStage] ?? null;
 
-      // Special: architect completion runs in dashboard; no session to close
+      // After prompter: count task files for the coder's task loop
+      if (pipeline.currentStage === "prompting") {
+        const taskCount = countTaskFiles(pipeline.artifactsDir);
+        pipeline.stages.coding.tasksTotal = taskCount;
+      }
+
+      // Architect runs in dashboard — agent_end fires in dashboard,
+      // so /pipeline-advance runs in the right context already
       if (DASHBOARD_STAGES.has(pipeline.currentStage)) {
         writePipeline(pipeline);
-        ctx.ui.notify("Architect complete. Advancing pipeline...", "info");
+        ctx.ui.notify("Advancing pipeline...", "info");
         pi.sendUserMessage(`/pipeline-advance ${pipeline.currentStage}`, {
           deliverAs: "followUp" as any,
         });
         return;
       }
 
+      // Child stage: switch back to dashboard, then advance from there.
+      // This ensures /pipeline-advance runs in the dashboard context,
+      // and dashboard-bound stages (architect) are set up properly.
       writePipeline(pipeline);
-      pi.sendUserMessage(`/pipeline-advance ${pipeline.currentStage}`, {
-        deliverAs: "followUp" as any,
-      });
+
+      const dashboardFile = pipeline.dashboardSessionFile;
+      if (dashboardFile) {
+        await ctx.switchSession(dashboardFile, {
+          withSession: async (_replacementCtx: any) => {
+            pi.sendUserMessage(`/pipeline-advance ${pipeline.currentStage}`, {
+              deliverAs: "followUp" as any,
+            });
+          },
+        });
+      } else {
+        // Fallback: advance in current session (for backward compat)
+        pi.sendUserMessage(`/pipeline-advance ${pipeline.currentStage}`, {
+          deliverAs: "followUp" as any,
+        });
+      }
       return;
     }
 
-    // Agent not done — check nudge threshold
+    // Agent not done — nudge if taking too long
     if (stage.turns >= MAX_TURNS_PER_STAGE && stage.nudges < MAX_NUDGES) {
       stage.nudges = (stage.nudges ?? 0) + 1;
       writePipeline(pipeline);
@@ -711,7 +736,6 @@ export default function (pi: ExtensionAPI) {
       pipeline.status = "failed";
       writePipeline(pipeline);
 
-      // Build failure recap
       const recap = buildFailureRecap(pipeline);
       ctx.sessionManager.appendCustomEntry("pipeline-status", recap);
       ctx.ui.notify(
@@ -734,17 +758,24 @@ export default function (pi: ExtensionAPI) {
         return;
       }
 
-      // Create pipeline ID from timestamp
       const now = new Date();
       const id = now.toISOString().replace(/[:.]/g, "-");
-      const artDir = artifactsDir(id);
+      const artDir = path.join(PIPELINE_BASE, id, "artifacts");
+      const dashboardSessionFile = ctx.sessionManager.getSessionFile();
+
+      if (!dashboardSessionFile) {
+        ctx.ui.notify("Session must be persisted. Start pi without --ephemeral.", "error");
+        return;
+      }
 
       // Ensure directories exist
       fs.mkdirSync(artDir, { recursive: true });
 
       // Save brain dump as prompt.md
-      const promptPath = path.join(artDir, "prompt.md");
-      fs.writeFileSync(promptPath, `# Design Prompt\n\n${prompt}\n\n---\nStarted: ${now.toISOString()}\n`);
+      fs.writeFileSync(
+        path.join(artDir, "prompt.md"),
+        `# Design Prompt\n\n${prompt}\n\n---\nStarted: ${now.toISOString()}\n`,
+      );
 
       // Create pipeline state
       const pipeline: Pipeline = {
@@ -752,6 +783,7 @@ export default function (pi: ExtensionAPI) {
         title: prompt.split("\n")[0].slice(0, 80),
         status: "running",
         currentStage: "research",
+        dashboardSessionFile,
         startedAt: now.toISOString(),
         stages: defaultStages(),
         loops: { remediation: 0, review: 0 },
@@ -765,8 +797,6 @@ export default function (pi: ExtensionAPI) {
       // Mark this session as the dashboard
       ctx.sessionManager.appendCustomEntry("pipeline-state", {
         pipelineId: id,
-        sessionId: ctx.sessionManager.getSessionFile(),
-        role: "dashboard",
       });
 
       ctx.ui.notify(
@@ -779,14 +809,14 @@ export default function (pi: ExtensionAPI) {
         "info",
       );
 
-      // Kick off first stage: researcher
+      // Kick off first stage: researcher (child session)
       await createStageSession(pi, ctx, pipeline, "research", false);
     },
   });
 
   // ── /pipeline-advance — advance to next stage ─────
   pi.registerCommand("pipeline-advance", {
-    description: "Advance pipeline to next stage (internal, auto-triggered)",
+    description: "Advance pipeline to next stage (internal)",
     handler: async (args, ctx) => {
       const stageName = args?.trim();
       const entries = ctx.sessionManager.getEntries();
@@ -807,15 +837,14 @@ export default function (pi: ExtensionAPI) {
         pipeline.stages[stageName].status = "done";
       }
 
-      // Special: coding task loop
+      // Coder task loop: increment task counter, loop if more tasks remain
       if (stageName === "coding") {
         const coding = pipeline.stages.coding;
         const tasksTotal = coding.tasksTotal ?? 0;
         const tasksDone = (coding.tasksDone ?? 0) + 1;
         coding.tasksDone = tasksDone;
 
-        if (tasksDone < tasksTotal) {
-          // More tasks — create next coder session
+        if (tasksTotal > 0 && tasksDone < tasksTotal) {
           writePipeline(pipeline);
           ctx.ui.notify(
             `Task ${tasksDone}/${tasksTotal} done. Starting task ${tasksDone + 1}...`,
@@ -831,11 +860,16 @@ export default function (pi: ExtensionAPI) {
       const decision = decideNextStage(pipeline);
 
       if (!decision.nextStage) {
-        if (pipeline.status === "failed") {
-          ctx.ui.notify(
-            `Pipeline failed: ${decision.reason || "unknown"}`,
-            "error",
-          );
+        if (decision.reason && decision.reason.includes("Max")) {
+          pipeline.status = "failed";
+          writePipeline(pipeline);
+          ctx.ui.notify(`Pipeline failed: ${decision.reason}`, "error");
+          return;
+        }
+        if (decision.reason && decision.reason.includes("blocked")) {
+          pipeline.status = "failed";
+          writePipeline(pipeline);
+          ctx.ui.notify(`Pipeline blocked: ${decision.reason}`, "error");
           return;
         }
         // Pipeline complete
@@ -845,7 +879,15 @@ export default function (pi: ExtensionAPI) {
         return;
       }
 
-      // Advance
+      // Apply loop counters (side effects happen HERE, not in decideNextStage)
+      if (decision.isLoop) {
+        if (decision.loopType === "remediation") {
+          pipeline.loops.remediation = (pipeline.loops.remediation ?? 0) + 1;
+        } else if (decision.loopType === "review") {
+          pipeline.loops.review = (pipeline.loops.review ?? 0) + 1;
+        }
+      }
+
       writePipeline(pipeline);
       ctx.ui.notify(
         decision.isLoop
@@ -914,23 +956,7 @@ export default function (pi: ExtensionAPI) {
       lines.push("│ Commands: /pipeline-status  /pipeline-pause  /pipeline-abort");
       lines.push("└──────────────────────────────────────────────────────────────");
 
-      // Display as a user message in the session
-      const dashboardId = findPipelineSessionId(entries);
-      if (dashboardId) {
-        try {
-          const sm = SessionManager.open(dashboardId);
-          sm.appendMessage({
-            role: "user",
-            content: [{ type: "text", text: lines.join("\n") }],
-            timestamp: Date.now(),
-          });
-        } catch {
-          // If dashboard session isn't accessible, show inline
-          ctx.ui.notify(lines.join("\n"), "info");
-        }
-      } else {
-        ctx.ui.notify(lines.join("\n"), "info");
-      }
+      ctx.ui.notify(lines.join("\n"), "info");
     },
   });
 
@@ -1031,23 +1057,21 @@ export default function (pi: ExtensionAPI) {
           });
           sm.appendMessage({
             role: "user",
-            content: [
-              {
-                type: "text",
-                text: [
-                  `# Task: Implement \`${specName}\``,
-                  "",
-                  "You are the **coder** agent. Your job is to implement the specification below.",
-                  "Read it carefully and implement exactly what it specifies.",
-                  "",
-                  "When you are done (success or failure), run `/return` to hand results back.",
-                  "",
-                  "---",
-                  "",
-                  specContent,
-                ].join("\n"),
-              },
-            ],
+            content: [{
+              type: "text",
+              text: [
+                `# Task: Implement \`${specName}\``,
+                "",
+                "You are the **coder** agent. Your job is to implement the specification below.",
+                "Read it carefully and implement exactly what it specifies.",
+                "",
+                "When you are done (success or failure), run `/return` to hand results back.",
+                "",
+                "---",
+                "",
+                specContent,
+              ].join("\n"),
+            }],
             timestamp: Date.now(),
           });
         },
@@ -1118,5 +1142,4 @@ export default function (pi: ExtensionAPI) {
       });
     },
   });
-
 }
