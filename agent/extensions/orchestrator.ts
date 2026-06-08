@@ -418,6 +418,9 @@ async function createChildStageSession(
         `Stage: ${stageName}`,
         isLoop ? `Mode: ${loopType} loop (targeted fix)` : "",
         "",
+        `## Output Directory: \`${pipeline.artifactsDir}\``,
+        `All artifacts go here. This is an absolute filesystem path.`,
+        "",
         "## Pipeline Config",
         "```json",
         pipelineJson,
@@ -471,10 +474,12 @@ function buildStageInput(
 
   switch (stageName) {
     case "research":
+      parts.push(`## Output Directory: \`${artDir}\``);
       parts.push(`## Prompt\n\n${readArtifact("prompt.md")}`);
       break;
 
     case "architecture":
+      parts.push(`## Output Directory: \`${artDir}\``);
       parts.push(`## Research\n\n${readArtifact("research.md")}`);
       parts.push(`## Prompt\n\n${readArtifact("prompt.md")}`);
       break;
