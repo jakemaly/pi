@@ -474,7 +474,6 @@ function buildStageInput(
 
   switch (stageName) {
     case "research":
-      parts.push(`## Output Directory: \`${artDir}\``);
       parts.push(`## Prompt\n\n${readArtifact("prompt.md")}`);
       break;
 
