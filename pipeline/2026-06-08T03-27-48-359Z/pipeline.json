@@ -1,0 +1,81 @@
+{
+  "id": "2026-06-08T03-27-48-359Z",
+  "title": "hi",
+  "status": "running",
+  "currentStage": "research",
+  "startedAt": "2026-06-08T03:27:48.359Z",
+  "stages": {
+    "research": {
+      "status": "in_progress",
+      "artifact": null,
+      "turns": 1,
+      "nudges": 0,
+      "sessionFile": ""
+    },
+    "architecture": {
+      "status": "pending",
+      "artifact": null,
+      "turns": 0,
+      "nudges": 0
+    },
+    "planning": {
+      "status": "pending",
+      "artifact": null,
+      "turns": 0,
+      "nudges": 0
+    },
+    "testing": {
+      "status": "pending",
+      "artifact": null,
+      "turns": 0,
+      "nudges": 0
+    },
+    "prompting": {
+      "status": "pending",
+      "artifact": null,
+      "turns": 0,
+      "nudges": 0
+    },
+    "coding": {
+      "status": "pending",
+      "artifact": null,
+      "turns": 0,
+      "nudges": 0,
+      "tasksDone": 0,
+      "tasksTotal": 0
+    },
+    "debugging": {
+      "status": "pending",
+      "artifact": null,
+      "turns": 0,
+      "nudges": 0
+    },
+    "review": {
+      "status": "pending",
+      "artifact": null,
+      "turns": 0,
+      "nudges": 0
+    },
+    "refactoring": {
+      "status": "pending",
+      "artifact": null,
+      "turns": 0,
+      "nudges": 0
+    },
+    "documentation": {
+      "status": "pending",
+      "artifact": null,
+      "turns": 0,
+      "nudges": 0
+    }
+  },
+  "loops": {
+    "remediation": 0,
+    "review": 0
+  },
+  "maxLoops": {
+    "remediation": 3,
+    "review": 2
+  },
+  "artifactsDir": "/home/jake/.pi/pipeline/2026-06-08T03-27-48-359Z/artifacts"
+}

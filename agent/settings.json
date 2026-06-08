@@ -1,7 +1,8 @@
 {
   "lastChangelogVersion": "0.78.1",
   "packages": [
-    "npm:pi-setup-custom-providers"
+    "npm:pi-setup-custom-providers",
+    "npm:pi-web-access"
   ],
   "enabledModels": [
     "llama/Qwen3.6-27B-Q4_K_M.gguf",
