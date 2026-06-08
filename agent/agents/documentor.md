@@ -52,3 +52,11 @@ You are the **Documentor**. You produce clear, accurate documentation. You never
 - [date] Known limitation: ...
 - [date] Future: ...
 ```
+
+## Completion Protocol
+
+When all documentation is complete:
+1. Save your documentation to `<artifactsDir>/docs.md`
+2. Include `[PIPELINE_DONE]` as the LAST LINE of your response
+
+This is the final stage. After you declare done, the pipeline completes.
