@@ -36,7 +36,7 @@
     "deepseek": {
       "baseUrl": "https://api.deepseek.com/v1",
       "api": "openai-completions",
-      "apiKey": "sk-685bbf4672e542aa86633781c9287664",
+      "apiKey": "sk-74bbfa1cf2054ed89442a9f6303a96c5",
       "models": [
         {
           "id": "deepseek-v4-pro",
@@ -46,8 +46,8 @@
             "text"
           ],
           "contextWindow": 262144,
-          "maxTokens": 8192,
-          "limitSource": "inferred",
+          "maxTokens": 32768,
+          "limitSource": "detected",
           "cost": {
             "input": 0,
             "output": 0,
