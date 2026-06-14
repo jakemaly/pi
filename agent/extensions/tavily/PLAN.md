@@ -344,3 +344,6 @@ Request/response types for all 5 endpoints, derived from the OpenAPI specs.
 2. **Should we keep pi-web-access as a fallback?** If Tavily is rate-limited or down, having Exa/Perplexity/Gemini as backup could be valuable. **Decision: no — user explicitly wants to replace it. If needed later, can be added as a separate extension.**
 3. **Should the extension auto-detect when to use research vs search?** No — this is the LLM's job via tool descriptions and prompt guidelines. The extension just provides the tools.
 4. **Research file attachments?** Tavily research supports attaching `.txt`, `.md`, `.json` files. **Decision: skip for now — adds complexity. Can be added later if needed.**
+
+## Status
+- Implementation complete, all 5 tools tested and working
