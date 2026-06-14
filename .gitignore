@@ -15,3 +15,4 @@ npm/
 
 # Secrets
 auth.json
+tavily.json
