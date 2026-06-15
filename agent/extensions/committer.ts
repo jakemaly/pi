@@ -90,14 +90,6 @@ function hasRemote(branch: string, cwd: string): boolean {
 function ensureRemoteBranch(cwd: string): { branch: string; created: boolean } {
   const branch = currentBranch(cwd);
 
-  // If on main/master, create a feature branch
-  if (branch === "main" || branch === "master") {
-    const ts = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
-    const newBranch = `feature/pipeline-${ts}`;
-    exec(`git checkout -b "${newBranch}"`, cwd);
-    return { branch: newBranch, created: true };
-  }
-
   // Check if branch has a remote
   if (!hasRemote(branch, cwd)) {
     // Push and set upstream
@@ -114,8 +106,8 @@ const gitCommitTool = {
   name: "git_commit",
   label: "Git Commit",
   description:
-    "Create a conventional commit on a remote branch. Skips sensitive files automatically. " +
-    "Use after completing each implementation task or making significant progress.",
+    "Create a conventional commit on the current branch and push to remote. " +
+    "Skips sensitive files automatically. Use after completing each implementation task or making significant progress.",
   parameters: Type.Object({
     message: Type.String({
       description:
@@ -171,12 +163,8 @@ const gitCommitTool = {
 
     // 3. Ensure we're on a remote branch
     try {
-      const { branch, created } = ensureRemoteBranch(cwd);
-      if (created) {
-        results.push(`Created branch: ${branch}`);
-      } else {
-        results.push(`On branch: ${branch}`);
-      }
+      const { branch } = ensureRemoteBranch(cwd);
+      results.push(`On branch: ${branch}`);
     } catch (e: any) {
       return {
         content: [{ type: "text", text: `Failed to create/push branch:\n${e.message}` }],
