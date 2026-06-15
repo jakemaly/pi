@@ -1,0 +1,1545 @@
+{
+  "version": 1,
+  "sessions": {
+    "2026-06-08T23-06-12-747Z_019ea97c-8d8b-7648-b34a-bcdeed24242c": {
+      "sessionFile": "/home/jake/.pi/agent/sessions/--home-jake--/2026-06-08T23-06-12-747Z_019ea97c-8d8b-7648-b34a-bcdeed24242c.jsonl",
+      "cwd": "/home/jake",
+      "startedAt": "2026-06-08T23:06:14.014Z",
+      "endedAt": "2026-06-08T23:06:14.028Z",
+      "stats": {
+        "tokens": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0
+        },
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0
+        },
+        "models": {}
+      }
+    },
+    "2026-06-05T18-25-12-680Z_019e9908-35e8-750f-b6ab-f52b21d60212": {
+      "sessionFile": "/home/jake/.pi/agent/sessions/--home-jake--/2026-06-05T18-25-12-680Z_019e9908-35e8-750f-b6ab-f52b21d60212.jsonl",
+      "cwd": "/home/jake",
+      "startedAt": "2026-06-05T18:25:12.680Z",
+      "stats": {
+        "tokens": {
+          "input": 3328,
+          "output": 947,
+          "cacheRead": 16627,
+          "cacheWrite": 0,
+          "total": 20902
+        },
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0
+        },
+        "models": {
+          "llamacpp/Qwen3.6-27B-NEO-CODE-HERE-2T-OT-IQ4_NL.gguf": {
+            "tokens": {
+              "input": 3328,
+              "output": 947,
+              "cacheRead": 16627,
+              "cacheWrite": 0,
+              "total": 20902
+            },
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "total": 0
+            }
+          }
+        }
+      }
+    },
+    "2026-06-07T06-55-35-836Z_019ea0dd-919c-7026-9107-ec769df0641e": {
+      "sessionFile": "/home/jake/.pi/agent/sessions/--home-jake--/2026-06-07T06-55-35-836Z_019ea0dd-919c-7026-9107-ec769df0641e.jsonl",
+      "cwd": "/home/jake",
+      "startedAt": "2026-06-07T06:55:35.836Z",
+      "stats": {
+        "tokens": {
+          "input": 1526,
+          "output": 62,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 1588
+        },
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0
+        },
+        "models": {
+          "llamacpp/Qwen3.6-27B-NEO-CODE-HERE-2T-OT-IQ4_NL.gguf": {
+            "tokens": {
+              "input": 1526,
+              "output": 62,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "total": 1588
+            },
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "total": 0
+            }
+          }
+        }
+      }
+    },
+    "2026-06-07T07-00-43-429Z_019ea0e2-4325-7588-9d04-bf7e535508c6": {
+      "sessionFile": "/home/jake/.pi/agent/sessions/--home-jake--/2026-06-07T07-00-43-429Z_019ea0e2-4325-7588-9d04-bf7e535508c6.jsonl",
+      "cwd": "/home/jake",
+      "startedAt": "2026-06-07T07:00:43.429Z",
+      "stats": {
+        "tokens": {
+          "input": 1057,
+          "output": 75,
+          "cacheRead": 2020,
+          "cacheWrite": 0,
+          "total": 3152
+        },
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0
+        },
+        "models": {
+          "llama/Qwen3.6-27B-Q4_K_M.gguf": {
+            "tokens": {
+              "input": 1057,
+              "output": 75,
+              "cacheRead": 2020,
+              "cacheWrite": 0,
+              "total": 3152
+            },
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "total": 0
+            }
+          }
+        }
+      }
+    },
+    "2026-06-07T17-58-40-017Z_019ea33c-a091-7d6e-bec1-ae74abfb9b42": {
+      "sessionFile": "/home/jake/.pi/agent/sessions/--home-jake--/2026-06-07T17-58-40-017Z_019ea33c-a091-7d6e-bec1-ae74abfb9b42.jsonl",
+      "cwd": "/home/jake",
+      "startedAt": "2026-06-07T17:58:40.017Z",
+      "stats": {
+        "tokens": {
+          "input": 5496,
+          "output": 947,
+          "cacheRead": 37782,
+          "cacheWrite": 0,
+          "total": 44225
+        },
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0
+        },
+        "models": {
+          "llama/Qwen3.6-27B-Q4_K_M.gguf": {
+            "tokens": {
+              "input": 5496,
+              "output": 947,
+              "cacheRead": 37782,
+              "cacheWrite": 0,
+              "total": 44225
+            },
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "total": 0
+            }
+          }
+        }
+      }
+    },
+    "2026-06-07T20-20-02-799Z_019ea3be-106f-7cb5-ba7a-011bfd7150ae": {
+      "sessionFile": "/home/jake/.pi/agent/sessions/--home-jake--/2026-06-07T20-20-02-799Z_019ea3be-106f-7cb5-ba7a-011bfd7150ae.jsonl",
+      "cwd": "/home/jake",
+      "startedAt": "2026-06-07T20:20:02.799Z",
+      "stats": {
+        "tokens": {
+          "input": 17179,
+          "output": 716,
+          "cacheRead": 42117,
+          "cacheWrite": 0,
+          "total": 60012
+        },
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0
+        },
+        "models": {
+          "llama/Qwen3.6-27B-Q4_K_M.gguf": {
+            "tokens": {
+              "input": 17179,
+              "output": 716,
+              "cacheRead": 42117,
+              "cacheWrite": 0,
+              "total": 60012
+            },
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "total": 0
+            }
+          }
+        }
+      }
+    },
+    "2026-06-07T20-26-51-361Z_019ea3c4-4c61-7cf0-b101-5c1b19b264fb": {
+      "sessionFile": "/home/jake/.pi/agent/sessions/--home-jake--/2026-06-07T20-26-51-361Z_019ea3c4-4c61-7cf0-b101-5c1b19b264fb.jsonl",
+      "cwd": "/home/jake",
+      "startedAt": "2026-06-07T20:26:51.361Z",
+      "stats": {
+        "tokens": {
+          "input": 1352,
+          "output": 285,
+          "cacheRead": 11264,
+          "cacheWrite": 0,
+          "total": 12901
+        },
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0
+        },
+        "models": {
+          "deepseek/deepseek-v4-pro": {
+            "tokens": {
+              "input": 1352,
+              "output": 285,
+              "cacheRead": 11264,
+              "cacheWrite": 0,
+              "total": 12901
+            },
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "total": 0
+            }
+          }
+        }
+      }
+    },
+    "2026-06-07T20-51-33-035Z_019ea3da-e82b-7857-9b77-d7336faa9bf5": {
+      "sessionFile": "/home/jake/.pi/agent/sessions/--home-jake--/2026-06-07T20-51-33-035Z_019ea3da-e82b-7857-9b77-d7336faa9bf5.jsonl",
+      "cwd": "/home/jake",
+      "startedAt": "2026-06-09T18:19:38.725Z",
+      "endedAt": "2026-06-09T18:19:51.349Z",
+      "stats": {
+        "tokens": {
+          "input": 827461,
+          "output": 219598,
+          "cacheRead": 35311104,
+          "cacheWrite": 0,
+          "total": 36358163
+        },
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0
+        },
+        "models": {
+          "deepseek/deepseek-v4-pro": {
+            "tokens": {
+              "input": 827461,
+              "output": 219598,
+              "cacheRead": 35311104,
+              "cacheWrite": 0,
+              "total": 36358163
+            },
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "total": 0
+            }
+          }
+        }
+      }
+    },
+    "2026-06-07T20-59-43-323Z_019ea3e2-635b-779d-b790-3d0320fbe3ef": {
+      "sessionFile": "/home/jake/.pi/agent/sessions/--home-jake--/2026-06-07T20-59-43-323Z_019ea3e2-635b-779d-b790-3d0320fbe3ef.jsonl",
+      "cwd": "/home/jake",
+      "startedAt": "2026-06-07T20:59:43.323Z",
+      "stats": {
+        "tokens": {
+          "input": 7423,
+          "output": 1300,
+          "cacheRead": 16896,
+          "cacheWrite": 0,
+          "total": 25619
+        },
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0
+        },
+        "models": {
+          "deepseek/deepseek-v4-pro": {
+            "tokens": {
+              "input": 7423,
+              "output": 1300,
+              "cacheRead": 16896,
+              "cacheWrite": 0,
+              "total": 25619
+            },
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "total": 0
+            }
+          }
+        }
+      }
+    },
+    "2026-06-08T03-27-48-360Z_019ea545-b088-7113-a497-7b0960e711c9": {
+      "sessionFile": "/home/jake/.pi/agent/sessions/--home-jake--/2026-06-08T03-27-48-360Z_019ea545-b088-7113-a497-7b0960e711c9.jsonl",
+      "cwd": "/home/jake",
+      "startedAt": "2026-06-09T19:08:30.744Z",
+      "endedAt": "2026-06-09T19:08:36.967Z",
+      "stats": {
+        "tokens": {
+          "input": 2046,
+          "output": 150,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 2196
+        },
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0
+        },
+        "models": {
+          "llama/Qwen3.6-27B-Q4_K_M.gguf": {
+            "tokens": {
+              "input": 2046,
+              "output": 150,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "total": 2196
+            },
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "total": 0
+            }
+          }
+        }
+      }
+    },
+    "2026-06-08T03-42-28-751Z_019ea553-1f8f-7f3a-8b31-eaedab3a3492": {
+      "sessionFile": "/home/jake/.pi/agent/sessions/--home-jake--/2026-06-08T03-42-28-751Z_019ea553-1f8f-7f3a-8b31-eaedab3a3492.jsonl",
+      "cwd": "/home/jake",
+      "startedAt": "2026-06-08T03:42:28.751Z",
+      "stats": {
+        "tokens": {
+          "input": 135605,
+          "output": 32652,
+          "cacheRead": 2007587,
+          "cacheWrite": 0,
+          "total": 2175844
+        },
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0
+        },
+        "models": {
+          "llama/Qwen3.6-27B-Q4_K_M.gguf": {
+            "tokens": {
+              "input": 135605,
+              "output": 32652,
+              "cacheRead": 2007587,
+              "cacheWrite": 0,
+              "total": 2175844
+            },
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "total": 0
+            }
+          }
+        }
+      }
+    },
+    "2026-06-08T21-59-17-669Z_019ea93f-49a5-7c77-ab59-fa9292c407cc": {
+      "sessionFile": "/home/jake/.pi/agent/sessions/--home-jake-.pi--/2026-06-08T21-59-17-669Z_019ea93f-49a5-7c77-ab59-fa9292c407cc.jsonl",
+      "cwd": "/home/jake/.pi",
+      "startedAt": "2026-06-08T21:59:17.669Z",
+      "stats": {
+        "tokens": {
+          "input": 601654,
+          "output": 114176,
+          "cacheRead": 23353759,
+          "cacheWrite": 0,
+          "total": 24069589
+        },
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0
+        },
+        "models": {
+          "llama/Qwen3.6-27B-Q4_K_M.gguf": {
+            "tokens": {
+              "input": 439963,
+              "output": 66356,
+              "cacheRead": 19118367,
+              "cacheWrite": 0,
+              "total": 19624686
+            },
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "total": 0
+            }
+          },
+          "deepseek/deepseek-v4-pro": {
+            "tokens": {
+              "input": 161691,
+              "output": 47820,
+              "cacheRead": 4235392,
+              "cacheWrite": 0,
+              "total": 4444903
+            },
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "total": 0
+            }
+          }
+        }
+      }
+    },
+    "2026-06-07T19-00-02-345Z_019ea374-d0a9-70a6-ba6a-60b6a9498c5e": {
+      "sessionFile": "/home/jake/.pi/agent/sessions/--home-jake-projects-EduTutor-AI-Enhanced-Collaborative-Learning-Platform-App--/2026-06-07T19-00-02-345Z_019ea374-d0a9-70a6-ba6a-60b6a9498c5e.jsonl",
+      "cwd": "/home/jake/projects/EduTutor-AI-Enhanced-Collaborative-Learning-Platform-App",
+      "startedAt": "2026-06-07T19:00:02.345Z",
+      "stats": {
+        "tokens": {
+          "input": 245159,
+          "output": 21594,
+          "cacheRead": 3570453,
+          "cacheWrite": 0,
+          "total": 3837206
+        },
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0
+        },
+        "models": {
+          "deepseek/deepseek-v4-pro": {
+            "tokens": {
+              "input": 59090,
+              "output": 8821,
+              "cacheRead": 244864,
+              "cacheWrite": 0,
+              "total": 312775
+            },
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "total": 0
+            }
+          },
+          "llama/Qwen3.6-27B-Q4_K_M.gguf": {
+            "tokens": {
+              "input": 186069,
+              "output": 12773,
+              "cacheRead": 3325589,
+              "cacheWrite": 0,
+              "total": 3524431
+            },
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "total": 0
+            }
+          }
+        }
+      }
+    },
+    "2026-06-07T19-15-52-668Z_019ea383-50dc-7246-b1d1-39711ca6b926": {
+      "sessionFile": "/home/jake/.pi/agent/sessions/--home-jake-projects-EduTutor-AI-Enhanced-Collaborative-Learning-Platform-App--/2026-06-07T19-15-52-668Z_019ea383-50dc-7246-b1d1-39711ca6b926.jsonl",
+      "cwd": "/home/jake/projects/EduTutor-AI-Enhanced-Collaborative-Learning-Platform-App",
+      "startedAt": "2026-06-07T19:15:52.668Z",
+      "stats": {
+        "tokens": {
+          "input": 125166,
+          "output": 74009,
+          "cacheRead": 5396480,
+          "cacheWrite": 0,
+          "total": 5595655
+        },
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0
+        },
+        "models": {
+          "deepseek/deepseek-v4-pro": {
+            "tokens": {
+              "input": 125166,
+              "output": 74009,
+              "cacheRead": 5396480,
+              "cacheWrite": 0,
+              "total": 5595655
+            },
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "total": 0
+            }
+          }
+        }
+      }
+    },
+    "2026-06-07T18-50-02-211Z_019ea36b-a863-7860-b6f1-7dec498c19ff": {
+      "sessionFile": "/home/jake/.pi/agent/sessions/--home-jake-projects-EduTutor-AI-Enhanced-Collaborative-Learning-Platform-App-backend--/2026-06-07T18-50-02-211Z_019ea36b-a863-7860-b6f1-7dec498c19ff.jsonl",
+      "cwd": "/home/jake/projects/EduTutor-AI-Enhanced-Collaborative-Learning-Platform-App/backend",
+      "startedAt": "2026-06-07T18:50:02.211Z",
+      "stats": {
+        "tokens": {
+          "input": 63510,
+          "output": 19075,
+          "cacheRead": 1389440,
+          "cacheWrite": 0,
+          "total": 1472025
+        },
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0
+        },
+        "models": {
+          "deepseek/deepseek-v4-pro": {
+            "tokens": {
+              "input": 63510,
+              "output": 19075,
+              "cacheRead": 1389440,
+              "cacheWrite": 0,
+              "total": 1472025
+            },
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "total": 0
+            }
+          }
+        }
+      }
+    },
+    "2026-06-05T18-34-49-945Z_019e9911-04d9-7af1-82bd-f4250ffc03e4": {
+      "sessionFile": "/home/jake/.pi/agent/sessions/--home-jake-projects-agentic-ai-legal-system--/2026-06-05T18-34-49-945Z_019e9911-04d9-7af1-82bd-f4250ffc03e4.jsonl",
+      "cwd": "/home/jake/projects/agentic-ai-legal-system",
+      "startedAt": "2026-06-05T18:34:49.945Z",
+      "stats": {
+        "tokens": {
+          "input": 198208,
+          "output": 26706,
+          "cacheRead": 2744257,
+          "cacheWrite": 0,
+          "total": 2969171
+        },
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0
+        },
+        "models": {
+          "llamacpp/Qwen3.6-27B-NEO-CODE-HERE-2T-OT-IQ4_NL.gguf": {
+            "tokens": {
+              "input": 198208,
+              "output": 26706,
+              "cacheRead": 2744257,
+              "cacheWrite": 0,
+              "total": 2969171
+            },
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "total": 0
+            }
+          }
+        }
+      }
+    },
+    "2026-06-06T14-11-53-399Z_019e9d46-a5b7-7124-b992-23eefdd8dd8d": {
+      "sessionFile": "/home/jake/.pi/agent/sessions/--home-jake-projects-agentic-ai-legal-system--/2026-06-06T14-11-53-399Z_019e9d46-a5b7-7124-b992-23eefdd8dd8d.jsonl",
+      "cwd": "/home/jake/projects/agentic-ai-legal-system",
+      "startedAt": "2026-06-06T14:11:53.399Z",
+      "stats": {
+        "tokens": {
+          "input": 69246,
+          "output": 9982,
+          "cacheRead": 450405,
+          "cacheWrite": 0,
+          "total": 529633
+        },
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0
+        },
+        "models": {
+          "llamacpp/Qwen3.6-27B-NEO-CODE-HERE-2T-OT-IQ4_NL.gguf": {
+            "tokens": {
+              "input": 69246,
+              "output": 9982,
+              "cacheRead": 450405,
+              "cacheWrite": 0,
+              "total": 529633
+            },
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "total": 0
+            }
+          }
+        }
+      }
+    },
+    "2026-06-07T17-19-14-172Z_019ea318-86fc-70a2-aeb9-80d4fe53c19e": {
+      "sessionFile": "/home/jake/.pi/agent/sessions/--home-jake-projects-agentic-ai-legal-system--/2026-06-07T17-19-14-172Z_019ea318-86fc-70a2-aeb9-80d4fe53c19e.jsonl",
+      "cwd": "/home/jake/projects/agentic-ai-legal-system",
+      "startedAt": "2026-06-07T17:19:14.172Z",
+      "stats": {
+        "tokens": {
+          "input": 88444,
+          "output": 5555,
+          "cacheRead": 516686,
+          "cacheWrite": 0,
+          "total": 610685
+        },
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0
+        },
+        "models": {
+          "llama/Qwen3.6-27B-Q4_K_M.gguf": {
+            "tokens": {
+              "input": 88444,
+              "output": 5555,
+              "cacheRead": 516686,
+              "cacheWrite": 0,
+              "total": 610685
+            },
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "total": 0
+            }
+          }
+        }
+      }
+    },
+    "2026-06-07T23-39-50-472Z_019ea474-fb47-765e-85d1-8107cc76003b": {
+      "sessionFile": "/home/jake/.pi/agent/sessions/--home-jake-projects-agentic-ai-legal-system--/2026-06-07T23-39-50-472Z_019ea474-fb47-765e-85d1-8107cc76003b.jsonl",
+      "cwd": "/home/jake/projects/agentic-ai-legal-system",
+      "startedAt": "2026-06-07T23:39:50.472Z",
+      "stats": {
+        "tokens": {
+          "input": 12435,
+          "output": 1893,
+          "cacheRead": 99057,
+          "cacheWrite": 0,
+          "total": 113385
+        },
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0
+        },
+        "models": {
+          "llama/Qwen3.6-27B-Q4_K_M.gguf": {
+            "tokens": {
+              "input": 12435,
+              "output": 1893,
+              "cacheRead": 99057,
+              "cacheWrite": 0,
+              "total": 113385
+            },
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "total": 0
+            }
+          }
+        }
+      }
+    },
+    "2026-06-09T14-33-41-951Z_019eaccd-b13f-7a5b-8316-1818a1dd250f": {
+      "sessionFile": "/home/jake/.pi/agent/sessions/--home-jake--/2026-06-09T14-33-41-951Z_019eaccd-b13f-7a5b-8316-1818a1dd250f.jsonl",
+      "cwd": "/home/jake",
+      "startedAt": "2026-06-09T14:33:41.951Z",
+      "stats": {
+        "tokens": {
+          "input": 4952,
+          "output": 487,
+          "cacheRead": 12329,
+          "cacheWrite": 0,
+          "total": 17768
+        },
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0
+        },
+        "models": {
+          "llama/Qwen3.6-27B-Q4_K_M.gguf": {
+            "tokens": {
+              "input": 4952,
+              "output": 487,
+              "cacheRead": 12329,
+              "cacheWrite": 0,
+              "total": 17768
+            },
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "total": 0
+            }
+          }
+        }
+      }
+    },
+    "2026-06-09T17-15-23-216Z_019ead61-b8d0-7bb5-a3c8-f4cccd95ea0e": {
+      "sessionFile": "/home/jake/.pi/agent/sessions/--home-jake-projects-agentic-ai-legal-system--/2026-06-09T17-15-23-216Z_019ead61-b8d0-7bb5-a3c8-f4cccd95ea0e.jsonl",
+      "cwd": "/home/jake/projects/agentic-ai-legal-system",
+      "startedAt": "2026-06-09T17:15:23.216Z",
+      "stats": {
+        "tokens": {
+          "input": 32866,
+          "output": 5824,
+          "cacheRead": 639780,
+          "cacheWrite": 0,
+          "total": 678470
+        },
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0
+        },
+        "models": {
+          "llama/Qwen3.6-27B-Q4_K_M.gguf": {
+            "tokens": {
+              "input": 32866,
+              "output": 5824,
+              "cacheRead": 639780,
+              "cacheWrite": 0,
+              "total": 678470
+            },
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "total": 0
+            }
+          }
+        }
+      }
+    },
+    "2026-06-09T17-24-50-896Z_019ead6a-6250-7864-82cf-40d996c90aff": {
+      "sessionFile": "/home/jake/.pi/agent/sessions/--home-jake-projects-agentic-ai-legal-system--/2026-06-09T17-24-50-896Z_019ead6a-6250-7864-82cf-40d996c90aff.jsonl",
+      "cwd": "/home/jake/projects/agentic-ai-legal-system",
+      "startedAt": "2026-06-09T17:24:50.896Z",
+      "stats": {
+        "tokens": {
+          "input": 20159,
+          "output": 1381,
+          "cacheRead": 85726,
+          "cacheWrite": 0,
+          "total": 107266
+        },
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0
+        },
+        "models": {
+          "llama/Qwen3.6-27B-Q4_K_M.gguf": {
+            "tokens": {
+              "input": 20159,
+              "output": 1381,
+              "cacheRead": 85726,
+              "cacheWrite": 0,
+              "total": 107266
+            },
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "total": 0
+            }
+          }
+        }
+      }
+    },
+    "2026-06-09T17-27-29-073Z_019ead6c-cc31-7d50-826b-5bb8f90fd245": {
+      "sessionFile": "/home/jake/.pi/agent/sessions/--home-jake--/2026-06-09T17-27-29-073Z_019ead6c-cc31-7d50-826b-5bb8f90fd245.jsonl",
+      "cwd": "/home/jake",
+      "startedAt": "2026-06-09T19:08:09.742Z",
+      "endedAt": "2026-06-09T19:08:18.556Z",
+      "stats": {
+        "tokens": {
+          "input": 86298,
+          "output": 11946,
+          "cacheRead": 1124094,
+          "cacheWrite": 0,
+          "total": 1222338
+        },
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0
+        },
+        "models": {
+          "llama/Qwen3.6-27B-Q4_K_M.gguf": {
+            "tokens": {
+              "input": 86298,
+              "output": 11946,
+              "cacheRead": 1124094,
+              "cacheWrite": 0,
+              "total": 1222338
+            },
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "total": 0
+            }
+          }
+        }
+      }
+    },
+    "2026-06-09T18-42-53-107Z_019eadb1-d432-7878-93a1-4e5dfbe50b76": {
+      "sessionFile": "/home/jake/.pi/agent/sessions/--home-jake-.pi--/2026-06-09T18-42-53-107Z_019eadb1-d432-7878-93a1-4e5dfbe50b76.jsonl",
+      "cwd": "/home/jake/.pi",
+      "startedAt": "2026-06-09T18:42:53.107Z",
+      "stats": {
+        "tokens": {
+          "input": 652,
+          "output": 93,
+          "cacheRead": 6570,
+          "cacheWrite": 0,
+          "total": 7315
+        },
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0
+        },
+        "models": {
+          "llama/Qwen3.6-27B-Q4_K_M.gguf": {
+            "tokens": {
+              "input": 652,
+              "output": 93,
+              "cacheRead": 6570,
+              "cacheWrite": 0,
+              "total": 7315
+            },
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "total": 0
+            }
+          }
+        }
+      }
+    },
+    "2026-06-09T20-26-45-035Z_019eae10-ebaa-77b6-8f5e-6c4619ae278f": {
+      "sessionFile": "/home/jake/.pi/agent/sessions/--home-jake-.pi--/2026-06-09T20-26-45-035Z_019eae10-ebaa-77b6-8f5e-6c4619ae278f.jsonl",
+      "cwd": "/home/jake/.pi",
+      "startedAt": "2026-06-09T20:26:45.035Z",
+      "stats": {
+        "tokens": {
+          "input": 4569,
+          "output": 309,
+          "cacheRead": 7371,
+          "cacheWrite": 0,
+          "total": 12249
+        },
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0
+        },
+        "models": {
+          "llama/Qwen3.6-27B-Q4_K_M.gguf": {
+            "tokens": {
+              "input": 4569,
+              "output": 309,
+              "cacheRead": 7371,
+              "cacheWrite": 0,
+              "total": 12249
+            },
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "total": 0
+            }
+          }
+        }
+      }
+    },
+    "2026-06-09T20-47-54-559Z_019eae24-4abf-76c5-8c55-8481084511cf": {
+      "sessionFile": "/home/jake/.pi/agent/sessions/--home-jake-.pi--/2026-06-09T20-47-54-559Z_019eae24-4abf-76c5-8c55-8481084511cf.jsonl",
+      "cwd": "/home/jake/.pi",
+      "startedAt": "2026-06-09T20:47:55.659Z",
+      "endedAt": "2026-06-09T20:48:11.130Z",
+      "stats": {
+        "tokens": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0
+        },
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0
+        },
+        "models": {}
+      }
+    },
+    "2026-06-09T21-40-21-535Z_019eae54-4f9f-737e-ad2c-dac9af2a47f8": {
+      "sessionFile": "/home/jake/.pi/agent/sessions/--home-jake-projects-second-brain--/2026-06-09T21-40-21-535Z_019eae54-4f9f-737e-ad2c-dac9af2a47f8.jsonl",
+      "cwd": "/home/jake/projects/second-brain",
+      "startedAt": "2026-06-09T21:40:21.535Z",
+      "stats": {
+        "tokens": {
+          "input": 270501,
+          "output": 56913,
+          "cacheRead": 7651072,
+          "cacheWrite": 0,
+          "total": 7978486
+        },
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0
+        },
+        "models": {
+          "deepseek/deepseek-v4-pro": {
+            "tokens": {
+              "input": 270501,
+              "output": 56913,
+              "cacheRead": 7651072,
+              "cacheWrite": 0,
+              "total": 7978486
+            },
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "total": 0
+            }
+          }
+        }
+      }
+    },
+    "2026-06-10T15-11-15-781Z_019eb216-7145-777f-8ff9-a3603569cb64": {
+      "sessionFile": "/home/jake/.pi/agent/sessions/--home-jake-projects-anything-voice--/2026-06-10T15-11-15-781Z_019eb216-7145-777f-8ff9-a3603569cb64.jsonl",
+      "cwd": "/home/jake/projects/anything-voice",
+      "startedAt": "2026-06-10T15:11:15.781Z",
+      "stats": {
+        "tokens": {
+          "input": 924863,
+          "output": 118955,
+          "cacheRead": 39985681,
+          "cacheWrite": 0,
+          "total": 41029499
+        },
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0
+        },
+        "models": {
+          "deepseek/deepseek-v4-pro": {
+            "tokens": {
+              "input": 282925,
+              "output": 27682,
+              "cacheRead": 2383872,
+              "cacheWrite": 0,
+              "total": 2694479
+            },
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "total": 0
+            }
+          },
+          "llama/Qwen3.6-27B-Q4_K_M.gguf": {
+            "tokens": {
+              "input": 641938,
+              "output": 91273,
+              "cacheRead": 37601809,
+              "cacheWrite": 0,
+              "total": 38335020
+            },
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "total": 0
+            }
+          }
+        }
+      }
+    },
+    "2026-06-11T01-12-53-868Z_019eb43d-416b-7973-bc0f-71a96a1a3753": {
+      "sessionFile": "/home/jake/.pi/agent/sessions/--home-jake-projects-EduTutor-AI-Enhanced-Collaborative-Learning-Platform-App--/2026-06-11T01-12-53-868Z_019eb43d-416b-7973-bc0f-71a96a1a3753.jsonl",
+      "cwd": "/home/jake/projects/EduTutor-AI-Enhanced-Collaborative-Learning-Platform-App",
+      "startedAt": "2026-06-11T01:12:53.868Z",
+      "stats": {
+        "tokens": {
+          "input": 28809,
+          "output": 2746,
+          "cacheRead": 260432,
+          "cacheWrite": 0,
+          "total": 291987
+        },
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0
+        },
+        "models": {
+          "llama/Qwen3.6-27B-Q4_K_M.gguf": {
+            "tokens": {
+              "input": 28809,
+              "output": 2746,
+              "cacheRead": 260432,
+              "cacheWrite": 0,
+              "total": 291987
+            },
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "total": 0
+            }
+          }
+        }
+      }
+    },
+    "2026-06-12T17-44-05-902Z_019ebcef-160e-7804-913b-0f4a9801f038": {
+      "sessionFile": "/home/jake/.pi/agent/sessions/--home-jake-projects-EduTutor-AI-Enhanced-Collaborative-Learning-Platform-App--/2026-06-12T17-44-05-902Z_019ebcef-160e-7804-913b-0f4a9801f038.jsonl",
+      "cwd": "/home/jake/projects/EduTutor-AI-Enhanced-Collaborative-Learning-Platform-App",
+      "startedAt": "2026-06-12T17:44:05.902Z",
+      "stats": {
+        "tokens": {
+          "input": 10987,
+          "output": 951,
+          "cacheRead": 54926,
+          "cacheWrite": 0,
+          "total": 66864
+        },
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0
+        },
+        "models": {
+          "llama/Qwen3.6-27B-Q4_K_M.gguf": {
+            "tokens": {
+              "input": 10987,
+              "output": 951,
+              "cacheRead": 54926,
+              "cacheWrite": 0,
+              "total": 66864
+            },
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "total": 0
+            }
+          }
+        }
+      }
+    },
+    "2026-06-12T18-06-20-473Z_019ebd03-7339-7cbe-8702-16c821d51f19": {
+      "sessionFile": "/home/jake/.pi/agent/sessions/--home-jake-projects-anything-voice--/2026-06-12T18-06-20-473Z_019ebd03-7339-7cbe-8702-16c821d51f19.jsonl",
+      "cwd": "/home/jake/projects/anything-voice",
+      "startedAt": "2026-06-12T18:06:20.473Z",
+      "stats": {
+        "tokens": {
+          "input": 71734,
+          "output": 8801,
+          "cacheRead": 2110817,
+          "cacheWrite": 0,
+          "total": 2191352
+        },
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0
+        },
+        "models": {
+          "llama/Qwen3.6-27B-Q4_K_M.gguf": {
+            "tokens": {
+              "input": 71734,
+              "output": 8801,
+              "cacheRead": 2110817,
+              "cacheWrite": 0,
+              "total": 2191352
+            },
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "total": 0
+            }
+          }
+        }
+      }
+    },
+    "2026-06-14T21-36-53-461Z_019ec810-eed5-74a7-98b6-66d40096a15b": {
+      "sessionFile": "/home/jake/.pi/agent/sessions/--home-jake--/2026-06-14T21-36-53-461Z_019ec810-eed5-74a7-98b6-66d40096a15b.jsonl",
+      "cwd": "/home/jake",
+      "startedAt": "2026-06-14T21:37:09.010Z",
+      "endedAt": "2026-06-14T21:39:33.743Z",
+      "stats": {
+        "tokens": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0
+        },
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0
+        },
+        "models": {}
+      }
+    },
+    "2026-06-14T21-40-38-535Z_019ec814-5e07-7842-88d1-dbf2dd3421b1": {
+      "sessionFile": "/home/jake/.pi/agent/sessions/--home-jake-.pi--/2026-06-14T21-40-38-535Z_019ec814-5e07-7842-88d1-dbf2dd3421b1.jsonl",
+      "cwd": "/home/jake/.pi",
+      "startedAt": "2026-06-14T21:40:38.535Z",
+      "stats": {
+        "tokens": {
+          "input": 452746,
+          "output": 35855,
+          "cacheRead": 19632087,
+          "cacheWrite": 0,
+          "total": 20120688
+        },
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0
+        },
+        "models": {
+          "llama/Qwen3.6-27B-Q4_K_M.gguf": {
+            "tokens": {
+              "input": 452746,
+              "output": 35855,
+              "cacheRead": 19632087,
+              "cacheWrite": 0,
+              "total": 20120688
+            },
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "total": 0
+            }
+          }
+        }
+      }
+    },
+    "2026-06-14T22-21-09-899Z_019ec839-778b-7f23-ac45-7e3d4a6b84c1": {
+      "sessionFile": "/home/jake/.pi/agent/sessions/--home-jake-.pi--/2026-06-14T22-21-09-899Z_019ec839-778b-7f23-ac45-7e3d4a6b84c1.jsonl",
+      "cwd": "/home/jake/.pi",
+      "startedAt": "2026-06-14T22:21:09.899Z",
+      "stats": {
+        "tokens": {
+          "input": 8098,
+          "output": 621,
+          "cacheRead": 5817,
+          "cacheWrite": 0,
+          "total": 14536
+        },
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0
+        },
+        "models": {
+          "llama/Qwen3.6-27B-Q4_K_M.gguf": {
+            "tokens": {
+              "input": 8098,
+              "output": 621,
+              "cacheRead": 5817,
+              "cacheWrite": 0,
+              "total": 14536
+            },
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "total": 0
+            }
+          }
+        }
+      }
+    },
+    "2026-06-14T22-21-39-484Z_019ec839-eb1c-7a07-ad98-cfd2f4d3b46f": {
+      "sessionFile": "/home/jake/.pi/agent/sessions/--home-jake-.pi--/2026-06-14T22-21-39-484Z_019ec839-eb1c-7a07-ad98-cfd2f4d3b46f.jsonl",
+      "cwd": "/home/jake/.pi",
+      "startedAt": "2026-06-14T22:21:39.484Z",
+      "stats": {
+        "tokens": {
+          "input": 8462,
+          "output": 339,
+          "cacheRead": 17068,
+          "cacheWrite": 0,
+          "total": 25869
+        },
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0
+        },
+        "models": {
+          "llama/Qwen3.6-27B-Q4_K_M.gguf": {
+            "tokens": {
+              "input": 8462,
+              "output": 339,
+              "cacheRead": 17068,
+              "cacheWrite": 0,
+              "total": 25869
+            },
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "total": 0
+            }
+          }
+        }
+      }
+    },
+    "2026-06-14T22-22-03-715Z_019ec83a-49c3-701c-8625-70b872e70101": {
+      "sessionFile": "/home/jake/.pi/agent/sessions/--home-jake-.pi--/2026-06-14T22-22-03-715Z_019ec83a-49c3-701c-8625-70b872e70101.jsonl",
+      "cwd": "/home/jake/.pi",
+      "startedAt": "2026-06-14T22:22:03.715Z",
+      "stats": {
+        "tokens": {
+          "input": 729,
+          "output": 234,
+          "cacheRead": 11123,
+          "cacheWrite": 0,
+          "total": 12086
+        },
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0
+        },
+        "models": {
+          "llama/Qwen3.6-27B-Q4_K_M.gguf": {
+            "tokens": {
+              "input": 729,
+              "output": 234,
+              "cacheRead": 11123,
+              "cacheWrite": 0,
+              "total": 12086
+            },
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "total": 0
+            }
+          }
+        }
+      }
+    },
+    "2026-06-14T22-22-17-011Z_019ec83a-7db3-7cbd-a2b2-085d54198014": {
+      "sessionFile": "/home/jake/.pi/agent/sessions/--home-jake-.pi--/2026-06-14T22-22-17-011Z_019ec83a-7db3-7cbd-a2b2-085d54198014.jsonl",
+      "cwd": "/home/jake/.pi",
+      "startedAt": "2026-06-14T22:22:17.011Z",
+      "stats": {
+        "tokens": {
+          "input": 5020,
+          "output": 416,
+          "cacheRead": 11127,
+          "cacheWrite": 0,
+          "total": 16563
+        },
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0
+        },
+        "models": {
+          "llama/Qwen3.6-27B-Q4_K_M.gguf": {
+            "tokens": {
+              "input": 5020,
+              "output": 416,
+              "cacheRead": 11127,
+              "cacheWrite": 0,
+              "total": 16563
+            },
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "total": 0
+            }
+          }
+        }
+      }
+    },
+    "2026-06-14T22-22-39-159Z_019ec83a-d437-79a2-a528-3bff05cc3119": {
+      "sessionFile": "/home/jake/.pi/agent/sessions/--home-jake-.pi--/2026-06-14T22-22-39-159Z_019ec83a-d437-79a2-a528-3bff05cc3119.jsonl",
+      "cwd": "/home/jake/.pi",
+      "startedAt": "2026-06-14T22:22:39.159Z",
+      "stats": {
+        "tokens": {
+          "input": 2848,
+          "output": 797,
+          "cacheRead": 29230,
+          "cacheWrite": 0,
+          "total": 32875
+        },
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0
+        },
+        "models": {
+          "llama/Qwen3.6-27B-Q4_K_M.gguf": {
+            "tokens": {
+              "input": 2848,
+              "output": 797,
+              "cacheRead": 29230,
+              "cacheWrite": 0,
+              "total": 32875
+            },
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "total": 0
+            }
+          }
+        }
+      }
+    },
+    "2026-06-14T22-50-46-675Z_019ec854-9412-7dd9-b481-ca66a8a3d9f0": {
+      "sessionFile": "/home/jake/.pi/agent/sessions/--home-jake-projects-agentic-ai-legal-system--/2026-06-14T22-50-46-675Z_019ec854-9412-7dd9-b481-ca66a8a3d9f0.jsonl",
+      "cwd": "/home/jake/projects/agentic-ai-legal-system",
+      "startedAt": "2026-06-14T22:50:46.675Z",
+      "stats": {
+        "tokens": {
+          "input": 156814,
+          "output": 26095,
+          "cacheRead": 3522588,
+          "cacheWrite": 0,
+          "total": 3705497
+        },
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0
+        },
+        "models": {
+          "llama/Qwen3.6-27B-Q4_K_M.gguf": {
+            "tokens": {
+              "input": 156814,
+              "output": 26095,
+              "cacheRead": 3522588,
+              "cacheWrite": 0,
+              "total": 3705497
+            },
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "total": 0
+            }
+          }
+        }
+      }
+    }
+  },
+  "totals": {
+    "tokens": {
+      "input": 4497402,
+      "output": 802485,
+      "cacheRead": 150133772,
+      "cacheWrite": 0,
+      "total": 155433659
+    },
+    "cost": {
+      "total": 0
+    },
+    "sessionsCount": 39,
+    "firstSessionAt": "2026-06-05T18:25:12.680Z",
+    "lastSessionAt": "2026-06-14T22:50:46.675Z"
+  },
+  "lastScannedAt": "2026-06-15T00:10:15.786Z"
+}
