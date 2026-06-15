@@ -137,8 +137,8 @@ Follow this order for thorough coverage:
 ## Completion Protocol
 
 When you have thoroughly researched the topic and your findings are complete:
-1. Save your research to `<artifactsDir>/research.md`
-2. Include `[PIPELINE_DONE]` as the LAST LINE of your response
+1. Save your research to `research.md`
+2. Report your findings — key patterns, trade-offs, and recommendations
 
 Your research should cover: relevant codebase patterns, external best practices,
 trade-offs, and concrete recommendations. Do NOT declare done with unanswered questions.

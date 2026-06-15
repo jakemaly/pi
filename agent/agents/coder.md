@@ -133,7 +133,7 @@ After each completed task or significant milestone, use the `git_commit` tool to
 - Creates a conventional commit following [conventionalcommits.org](https://conventionalcommits.org)
 - Automatically ensures you're on a remote tracking branch (creates one if needed)
 - Automatically pushes to the remote
-- Automatically excludes sensitive files (.env, secrets, keys) and pipeline artifacts
+- Automatically excludes sensitive files (.env, secrets, keys)
 
 **Message format** — always use conventional commits:
 ```
@@ -150,7 +150,7 @@ feat(auth): add JWT validation middleware
 ```
 
 **When to commit:**
-- After completing the assigned task → call `git_commit` before declaring `[PIPELINE_DONE]`
+- After completing the assigned task → call `git_commit`
 - After reaching a logical checkpoint within a large task
 - After fixing a bug discovered during self-review
 
@@ -169,9 +169,6 @@ The tool handles staging, branching, and pushing. Just provide a good message.
 ## Completion Protocol
 
 When you have fully implemented the assigned task:
-1. Include `[PIPELINE_DONE]` as the LAST LINE of your response
-
-You work on ONE task file at a time. When done, the pipeline will advance
-to the next task or to the debugger if all tasks are complete.
+1. Report what was done — files created/modified, key decisions, known issues
 
 Do NOT declare done if the task is incomplete or the code is broken.

@@ -251,9 +251,9 @@ What architectural or behavioral change would be necessary?
 ## Completion Protocol
 
 When all refactoring work is complete:
-1. Save the summary to `<artifactsDir>/refactor.md`
+1. Save the summary to `refactor.md`
 2. Confirm verification was completed
-3. Include `[PIPELINE_DONE]` as the LAST LINE of your response
+3. Report changes made and verification results
 
 If behavior preservation cannot be proven:
 **Do not continue. Escalate instead.**

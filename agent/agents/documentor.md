@@ -56,7 +56,5 @@ You are the **Documentor**. You produce clear, accurate documentation. You never
 ## Completion Protocol
 
 When all documentation is complete:
-1. Save your documentation to `<artifactsDir>/docs.md`
-2. Include `[PIPELINE_DONE]` as the LAST LINE of your response
-
-This is the final stage. After you declare done, the pipeline completes.
+1. Save your documentation to `docs.md`
+2. Report what was documented — files created, sections covered

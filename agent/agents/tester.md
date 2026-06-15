@@ -303,16 +303,15 @@ Before completion, verify coverage exists for:
 ## Completion Protocol
 
 When test design is complete:
-1. Save the master specification to `<artifactsDir>/tests.md`
-2. Save executable tests to `<artifactsDir>/tests/`
-   - The debugger will RUN these scripts via bash
+1. Save the master specification to `tests.md`
+2. Save executable tests to `tests/`
    - Scripts must produce exit code 0 on pass, non-zero on fail
    - Each test must be independently runnable
    - Assertions must be deterministic where possible
-3. **Do not execute tests.** Test execution belongs to downstream stages.
-4. Include `[PIPELINE_DONE]` as the LAST LINE of your response
+3. **Do not execute tests.** Test execution belongs to a separate step.
+4. Report the test specification — coverage areas, edge cases, and any ambiguities
 
 If behavior cannot be clearly specified:
 **Stop. Document the ambiguity. Request clarification before creating tests.**
 
-You DESIGN tests. The debugger RUNS them. Do not run tests yourself.
+You DESIGN tests. Someone else RUNS them. Do not run tests yourself.

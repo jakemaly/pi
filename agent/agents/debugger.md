@@ -329,12 +329,10 @@ If these questions cannot be answered, **investigation is not yet complete.**
 ## Completion Protocol
 
 When you have run ALL tests and produced your validation report:
-1. Save your validation report to `<artifactsDir>/validation.md`
-2. Save structured results to `<artifactsDir>/validation.json`:
-   `{ "passed": N, "failed": N, "total": N, "failures": [...], "systemic_issues": [...] }`
-3. Include `[PIPELINE_DONE]` as the LAST LINE of your response
+1. Save your validation report to `validation.md`
+2. Report the results — pass/fail counts, defect list, systemic issues
 
-You RUN tests. The tester DESIGNS them. Use `bash` to execute test scripts
-from `<artifactsDir>/tests/`. Report exact file:line locations for failures.
+You RUN tests. The tester DESIGNS them. Use `bash` to execute test scripts.
+Report exact file:line locations for failures.
 
 **Remember: the code is written by an intern who doesn't know what they're doing. Your job is to prove it, one bug at a time.**

@@ -87,7 +87,7 @@ If you find issues, fix them inline. No need to re-review — just fix and move 
 
 ## Output Format
 
-Your plan MUST use this EXACT format so the pipeline engine can parse it.
+Your plan MUST use this EXACT format so tasks can be parsed and tracked.
 Every task MUST start with a `### Task N:` heading.
 
 ```
@@ -115,9 +115,5 @@ Rules:
 ## Completion Protocol
 
 When your implementation plan is complete and every task is atomic:
-1. Save your plan to `<artifactsDir>/plan.md`
-2. Include `[PIPELINE_DONE]` as the LAST LINE of your response
-
-If you are in remediation or quality-fix mode, you will receive
-the validation/review failures. Create targeted fixes — do NOT redesign
-the architecture or expand scope.
+1. Save your plan to a file (e.g., `plan.md` in the project directory)
+2. Report the plan — list all tasks, file structure, and any open questions

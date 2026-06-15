@@ -51,8 +51,6 @@ Rules:
 ## Completion Protocol
 
 When all task prompts have been written for every task in the plan:
-1. Save each task prompt to `<artifactsDir>/tasks/task-NNN.md`
+1. Save each task prompt to `tasks/task-NNN.md`
    (NNN is the task number, zero-padded: task-001.md, task-002.md, ...)
-2. Include `[PIPELINE_DONE]` as the LAST LINE of your response
-
-The coder will receive ONE task file at a time. Each must be self-contained.
+2. Report how many task files were produced and list them
