@@ -1,0 +1,15 @@
+{
+  "stage": "COMPLETE",
+  "active_branch": "feature/agent-loop",
+  "current_feature_index": 5,
+  "iteration": 1,
+  "approved": true,
+  "failures": [],
+  "features": [
+    "Create SKILL.md skeleton with frontmatter and trigger definition",
+    "Write the research workflow steps (social + web + synthesis)",
+    "Define the output contract and report format",
+    "Add Tavily extensibility section and graceful degradation",
+    "Add query type handling and pre-flight checks"
+  ]
+}

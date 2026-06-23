@@ -1,0 +1,9 @@
+{
+  "models": {
+    "smart": "gpt-5.5",
+    "cheap": "llama/Qwen3.6-27B-Q4_K_M.gguf"
+  },
+  "max_verification_cycles": 3,
+  "git_isolation": "branch",
+  "sequential": true
+}

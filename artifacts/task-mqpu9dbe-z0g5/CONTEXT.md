@@ -1,0 +1,25 @@
+# Task: Loop Step loop-planner
+
+## Instructions
+Draft the SPEC.md, implementation_plan.md, and rubric.md files based on this user intent:
+"Build a research skill that combines /last30days with tavily commands to do amazing external research. The skill should leverage /last30days for social/community signal (Reddit, X, YouTube, TikTok, HN, Polymarket) and tavily for deep web research (articles, documentation, news, blogs) to produce comprehensive research reports that cover both what people are saying and what the actual facts/sources say. The skill should work as a unified research workflow where both data sources inform a single synthesized output.
+
+IMPORTANT CONTEXT:
+- Tavily is NOT currently installed (no binary, no python package, no API key)
+- The harness HAS powerful native web research tools: web_search, search, extract, crawl, fetch_content, research
+- /last30days skill lives at /home/jake/last30days-skill/skills/last30days/
+- The skill should use whatever web research is available (tavily if installed, native tools otherwise) and be extensible
+- Target location for the new skill: /home/jake/.pi/agent/skills/ or /home/jake/last30days-skill/ (planner should decide)"
+Make sure the plan is strictly sequential, building one feature at a time, verifying it, and then moving to the next.
+
+## Working Directory
+/home/jake
+
+## Output
+Write your result to /home/jake/.pi/artifacts/task-mqpu9dbe-z0g5/RESULT.md
+
+Format requirements:
+<status>success|failure|blocked</status>
+<summary>One sentence description of what was done</summary>
+<findings>Findings/details</findings>
+<evidence>Verification outputs</evidence>

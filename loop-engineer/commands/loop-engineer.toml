@@ -1,0 +1,9 @@
+description = "Launch the modular sequential loop engineer to build features sequentially"
+
+prompt = """
+Invoke the loop-engineer skill.
+
+You will guide the user through building their requested feature sequentially.
+If the user hasn't provided their feature details/intent yet, ask them what they want to build.
+Once you have the user's intent, write it to `/home/jake/.pi/loop-intent.txt` and execute the loop coordinator by initializing `/home/jake/.pi/loop-state.json` and running `npx tsx /home/jake/.pi/loop-engineer/src/loop-engineer.ts` via Bash.
+"""

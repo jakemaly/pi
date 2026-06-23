@@ -2,11 +2,30 @@
   "lastChangelogVersion": "0.79.3",
   "packages": [
     "npm:pi-setup-custom-providers",
-    "npm:pi-web-access"
+    "npm:pi-web-access",
+    "npm:pi-speeed",
+    "npm:@heyhuynhgiabuu/pi-task",
+    "npm:pi-rtk-optimizer",
+    "npm:@juicesharp/rpiv-ask-user-question"
+  ],
+  "skills": [
+    "/home/jake/agent-skills/skills",
+    "/home/jake/ponytail/skills",
+    "/home/jake/last30days-skill/skills",
+    "/home/jake/.pi/loop-engineer/skills"
+  ],
+  "prompts": [
+    "/home/jake/agent-skills/commands",
+    "/home/jake/last30days-skill/commands",
+    "/home/jake/.pi/loop-engineer/commands"
+  ],
+  "extensions": [
+    "/home/jake/ponytail/pi-extension/index.js"
   ],
   "enabledModels": [
     "llama/Qwen3.6-27B-Q4_K_M.gguf",
-    "deepseek/deepseek-v4-pro"
+    "deepseek/deepseek-v4-pro",
+    "github-copilot/gpt-5.5"
   ],
   "defaultProvider": "llama",
   "defaultModel": "Qwen3.6-27B-Q4_K_M.gguf",
